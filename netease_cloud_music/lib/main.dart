@@ -6,7 +6,6 @@ import 'package:netease_cloud_music/provider/play_songs_model.dart';
 import 'package:netease_cloud_music/provider/user_model.dart';
 import 'package:netease_cloud_music/route/navigate_service.dart';
 import 'package:netease_cloud_music/route/routes.dart';
-import 'package:netease_cloud_music/utils/net_utils.dart';
 import 'package:provider/provider.dart';
 
 import 'application.dart';
@@ -23,13 +22,13 @@ void main() {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider<UserModel>(
-        builder: (_) => UserModel(),
+        create: (_) => UserModel(),
       ),
       ChangeNotifierProvider<PlaySongsModel>(
-        builder: (_) => PlaySongsModel()..init(),
+        create: (_) => PlaySongsModel()..init(),
       ),
       ChangeNotifierProvider<PlayListModel>(
-        builder: (_) => PlayListModel(),
+        create: (_) => PlayListModel(),
       ),
     ],
     child: MyApp(),
