@@ -131,29 +131,31 @@ class _HomePrePageState extends State<DiscoverPage>
       futureFunc: NetUtils.getRecommendData,
       builder: (context, snapshot) {
         var data = snapshot.recommend;
-        return Container(
-            height: ScreenUtil().setWidth(300),
-            child: ListView.separated(
-              separatorBuilder: (context, index) {
-                return HEmptyView(ScreenUtil().setWidth(30));
-              },
-              padding: EdgeInsets.symmetric(
-                  horizontal: ScreenUtil().setWidth(15)),
-              itemBuilder: (context, index) {
-                return PlayListWidget(
-                  text: data[index].name,
-                  picUrl: data[index].picUrl,
-                  playCount: data[index].playcount,
-                  maxLines: 2,
-                  onTap: (){
-                    NavigatorUtil.goPlayListPage(context, data: data[index]);
-                  },
-                );
-              },
-              shrinkWrap: true,
-              scrollDirection: Axis.horizontal,
-              itemCount: data.length,
-            ));
+        return GridView.builder(
+            padding: EdgeInsets.symmetric(
+                horizontal: ScreenUtil().setWidth(15)),
+            itemBuilder: (context, index) {
+              return PlayListWidget(
+                text: data[index].name,
+                picUrl: data[index].picUrl,
+                playCount: data[index].playcount,
+                maxLines: 2,
+                onTap: (){
+                  NavigatorUtil.goPlayListPage(context, data: data[index]);
+                },
+              );
+            },
+            shrinkWrap: true,
+            scrollDirection: Axis.vertical,
+            itemCount: data.length,
+            physics: NeverScrollableScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3, //每行三列
+                crossAxisSpacing: ScreenUtil().setWidth(15),
+                mainAxisSpacing: ScreenUtil().setWidth(15),
+                childAspectRatio: 0.85 //显示区域宽高相等),
+            )
+        );
       },
     );
   }

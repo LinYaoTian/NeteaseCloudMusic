@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:netease_cloud_music/application.dart';
 import 'package:netease_cloud_music/model/song.dart';
-import 'package:netease_cloud_music/model/user.dart';
 import 'package:netease_cloud_music/provider/play_list_model.dart';
 import 'package:netease_cloud_music/provider/play_songs_model.dart';
 import 'package:netease_cloud_music/provider/user_model.dart';
 import 'package:netease_cloud_music/utils/fluro_convert_utils.dart';
 import 'package:netease_cloud_music/utils/navigator_util.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:netease_cloud_music/utils/net_utils.dart';
 import 'package:provider/provider.dart';
 

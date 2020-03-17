@@ -1,17 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:audioplayers/audioplayers.dart';
-import 'package:common_utils/common_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:netease_cloud_music/application.dart';
 import 'package:netease_cloud_music/model/song.dart';
-import 'package:netease_cloud_music/model/user.dart';
 import 'package:netease_cloud_music/utils/fluro_convert_utils.dart';
-import 'package:netease_cloud_music/utils/navigator_util.dart';
-import 'package:netease_cloud_music/utils/net_utils.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:netease_cloud_music/utils/utils.dart';
 
 class PlaySongsModel with ChangeNotifier{
   AudioPlayer _audioPlayer = AudioPlayer();

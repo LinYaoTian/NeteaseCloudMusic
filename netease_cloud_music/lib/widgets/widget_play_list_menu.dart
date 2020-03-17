@@ -75,7 +75,7 @@ class _PlayListMenuWidgetState extends State<PlayListMenuWidget> {
             color: Colors.black26,
           ),
           Offstage(
-            offstage: widget._playlist.creator.userId != widget._model.user.account.id,
+            offstage: widget._playlist.creator.userId != widget._model.user.userId,
             child: _buildMenuItem('images/icon_edit.png', '编辑歌单信息', () {
 
               showDialog(context: context, builder: (context){
@@ -86,7 +86,7 @@ class _PlayListMenuWidgetState extends State<PlayListMenuWidget> {
             }),
           ),
           Offstage(
-            offstage: widget._playlist.creator.userId != widget._model.user.account.id,
+            offstage: widget._playlist.creator.userId != widget._model.user.userId,
             child: Container(
               color: Colors.grey,
               margin: EdgeInsets.only(left: ScreenUtil().setWidth(140)),

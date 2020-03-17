@@ -90,7 +90,6 @@ class _PlaySongsPageState extends State<PlaySongsPage>
                 height: double.infinity,
               ),
             ),
-
             AppBar(
               centerTitle: true,
               brightness: Brightness.dark,

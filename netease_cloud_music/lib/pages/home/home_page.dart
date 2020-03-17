@@ -19,7 +19,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(vsync: this, length: 3);
+    _tabController = TabController(vsync: this, length: 2);
   }
 
 
@@ -59,9 +59,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             Tab(
                               text: '我的',
                             ),
-                            Tab(
-                              text: '动态',
-                            ),
                           ],
                         ),
                       ),
@@ -87,7 +84,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       children: [
                         DiscoverPage(),
                         MyPage(),
-                        EventPage(),
                       ],
                     ),
                   ),

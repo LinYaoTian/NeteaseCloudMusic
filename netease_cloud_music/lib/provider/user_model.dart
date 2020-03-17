@@ -2,10 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:netease_cloud_music/application.dart';
+import 'package:netease_cloud_music/constans/config.dart';
 import 'package:netease_cloud_music/model/user.dart';
-import 'package:netease_cloud_music/utils/navigator_util.dart';
 import 'package:netease_cloud_music/utils/net_utils.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:netease_cloud_music/utils/utils.dart';
 
 class UserModel with ChangeNotifier {
@@ -25,11 +24,11 @@ class UserModel with ChangeNotifier {
   Future<User> login(BuildContext context, String phone, String pwd) async {
 
     User user = await NetUtils.login(context, phone, pwd);
-    if (user.code > 299) {
-      Utils.showToast(user.msg ?? '登录失败，请检查账号密码');
+    if (user.code != CODE_OK) {
+      Utils.showToast('登录失败，请检查账号密码');
       return null;
     }
-    Utils.showToast(user.msg ?? '登录成功');
+    Utils.showToast('登录成功');
     _saveUserInfo(user);
     return user;
   }

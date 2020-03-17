@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cookie_jar/cookie_jar.dart';
@@ -10,13 +11,13 @@ import 'package:netease_cloud_music/model/event.dart' as prefix0;
 import 'package:netease_cloud_music/model/hot_search.dart';
 import 'package:netease_cloud_music/model/lyric.dart';
 import 'package:netease_cloud_music/model/mv.dart';
+import 'package:netease_cloud_music/model/user.dart';
 import 'package:netease_cloud_music/model/play_list.dart';
 import 'package:netease_cloud_music/model/recommend.dart';
 import 'package:netease_cloud_music/model/search_result.dart' hide User;
 import 'package:netease_cloud_music/model/song_comment.dart' hide User;
 import 'package:netease_cloud_music/model/song_detail.dart';
 import 'package:netease_cloud_music/model/top_list.dart';
-import 'package:netease_cloud_music/model/user.dart';
 import 'package:netease_cloud_music/route/navigate_service.dart';
 import 'package:netease_cloud_music/route/routes.dart';
 import 'package:netease_cloud_music/utils/utils.dart';
@@ -28,16 +29,15 @@ import 'custom_log_interceptor.dart';
 
 class NetUtils {
   static Dio _dio;
-  static final String baseUrl = 'http://118.24.63.15';
+  static final String baseUrl = 'http://10.90.181.117:8000';
 
   static void init() async {
     Directory tempDir = await getTemporaryDirectory();
     String tempPath = tempDir.path;
     CookieJar cj = PersistCookieJar(dir: tempPath);
-    _dio = Dio(BaseOptions(baseUrl: '$baseUrl:1020', followRedirects: false))
+    _dio = Dio(BaseOptions(baseUrl: baseUrl, followRedirects: true))
       ..interceptors.add(CookieManager(cj))
-      ..interceptors
-          .add(CustomLogInterceptor(responseBody: true, requestBody: true));
+      ..interceptors.add(CustomLogInterceptor(responseBody: true, requestBody: true));
   }
 
   static Future<Response> _get(
@@ -55,12 +55,12 @@ class NetUtils {
       } else if (e.response != null) {
         if (e.response.statusCode >= 300 && e.response.statusCode < 400) {
           _reLogin();
-          return Future.error(Response(data: -1));
+          return Future.error(Response(data: "-2 response.statusCode = ${e.response.statusCode}"));
         } else {
           return Future.value(e.response);
         }
       } else {
-        return Future.error(Response(data: -1));
+        return Future.error(Response(data: -3));
       }
     } finally {
       Loading.hideLoading(context);
@@ -76,13 +76,13 @@ class NetUtils {
 
   /// 登录
   static Future<User> login(
-      BuildContext context, String phone, String password) async {
-    var response = await _get(context, '/login/cellphone', params: {
-      'phone': phone,
+      BuildContext context, String username, String password) async {
+    var response = await _get(context, '/users/login', params: {
+      'username': username,
       'password': password,
     });
 
-    return User.fromJson(response.data);
+    return User.fromJson(jsonDecode(response.data));
   }
 
   static Future<Response> refreshLogin(BuildContext context) async {
@@ -142,7 +142,7 @@ class NetUtils {
     BuildContext context, {
     Map<String, dynamic> params,
   }) async {
-    var response = await _get(context, '/playlist/detail', params: params);
+    var response = await _get(context, '/playlist/detail', params: params, isShowLoading: false);
     return PlayListData.fromJson(response.data);
   }
 

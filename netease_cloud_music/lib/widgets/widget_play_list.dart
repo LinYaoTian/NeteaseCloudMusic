@@ -34,7 +34,7 @@ class PlayListWidget extends StatelessWidget {
       child: Container(
         width: ScreenUtil().setWidth(200),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             picUrl == null ? Container() : PlayListCoverWidget(

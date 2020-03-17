@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:netease_cloud_music/model/play_list.dart';
 import 'package:netease_cloud_music/model/user.dart';
+import 'package:netease_cloud_music/model/play_list.dart';
 import 'package:netease_cloud_music/utils/net_utils.dart';
 
 class PlayListModel with ChangeNotifier {
@@ -24,9 +24,9 @@ class PlayListModel with ChangeNotifier {
 
   void _splitPlayList() {
     _selfCreatePlayList =
-        _allPlayList.where((p) => p.creator.userId == user.account.id).toList();
+        _allPlayList.where((p) => p.creator.userId == user.userId).toList();
     _collectPlayList =
-        _allPlayList.where((p) => p.creator.userId != user.account.id).toList();
+        _allPlayList.where((p) => p.creator.userId != user.userId).toList();
     notifyListeners();
   }
 
@@ -41,7 +41,7 @@ class PlayListModel with ChangeNotifier {
   }
 
   void getSelfPlaylistData(BuildContext context) async{
-    var result = await NetUtils.getSelfPlaylistData(context, params: {'uid': user.account.id});
+    var result = await NetUtils.getSelfPlaylistData(context, params: {'uid': user.userId});
     setPlayList(result.playlist);
   }
 }
