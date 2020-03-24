@@ -314,7 +314,7 @@ class _EventPageState extends State<EventPage>
                 contentWidget = EventSongWidget(prefix0.Song(curContent.song.id,
                     name: curContent.song.name,
                     picUrl: curContent.song.album.picUrl,
-                    artists:
+                    singerName:
                         curContent.song.artists.map((a) => a.name).join('/')));
                 break;
               default:

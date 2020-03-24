@@ -4,7 +4,7 @@ import 'package:netease_cloud_music/widgets/h_empty_view.dart';
 
 import 'common_text_style.dart';
 
-typedef SubmitCallback = Function(String name, bool isPrivate);
+typedef SubmitCallback = Function(String name, String intro);
 
 class CreatePlayListWidget extends StatefulWidget {
   final SubmitCallback submitCallback;
@@ -17,15 +17,30 @@ class CreatePlayListWidget extends StatefulWidget {
 
 class _CreatePlayListWidgetState extends State<CreatePlayListWidget> {
   bool isPrivatePlayList = false;
-  TextEditingController _editingController;
+  TextEditingController _editingTitleController;
+  TextEditingController _editingIntroController;
   SubmitCallback submitCallback;
 
   @override
   void initState() {
     super.initState();
-    _editingController = TextEditingController();
-    _editingController.addListener(() {
-      if (_editingController.text.isEmpty) {
+    _editingTitleController = TextEditingController();
+    _editingTitleController.addListener(() {
+      if (_editingTitleController.text.isEmpty) {
+        setState(() {
+          submitCallback = null;
+        });
+      } else {
+        setState(() {
+          if (submitCallback == null) {
+            submitCallback = widget.submitCallback;
+          }
+        });
+      }
+    });
+    _editingIntroController = TextEditingController();
+    _editingIntroController.addListener(() {
+      if (_editingIntroController.text.isEmpty) {
         setState(() {
           submitCallback = null;
         });
@@ -56,7 +71,7 @@ class _CreatePlayListWidgetState extends State<CreatePlayListWidget> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             TextField(
-              controller: _editingController,
+              controller: _editingTitleController,
               decoration: InputDecoration(
                 hintText: "请输入歌单标题",
                 hintStyle: common14GrayTextStyle,
@@ -64,36 +79,15 @@ class _CreatePlayListWidgetState extends State<CreatePlayListWidget> {
               style: common14TextStyle,
               maxLength: 40,
             ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  isPrivatePlayList = !isPrivatePlayList;
-                });
-              },
-              child: Row(
-                children: <Widget>[
-                  SizedBox(
-                    width: ScreenUtil().setWidth(40),
-                    height: ScreenUtil().setWidth(40),
-                    child: Checkbox(
-                        activeColor: Colors.red,
-                        value: isPrivatePlayList,
-                        onChanged: (v) {
-                          setState(() {
-                            isPrivatePlayList = v;
-                          });
-                        },
-                        materialTapTargetSize:
-                            MaterialTapTargetSize.shrinkWrap),
-                  ),
-                  HEmptyView(4),
-                  Text(
-                    '设置为隐私歌单',
-                    style: common15GrayTextStyle,
-                  )
-                ],
+            TextField(
+              controller: _editingIntroController,
+              decoration: InputDecoration(
+                hintText: "请输入歌单简介",
+                hintStyle: common14GrayTextStyle,
               ),
-            )
+              style: common14TextStyle,
+              maxLength: 40,
+            ),
           ],
         ),
       ),
@@ -107,7 +101,7 @@ class _CreatePlayListWidgetState extends State<CreatePlayListWidget> {
           onPressed: submitCallback == null
               ? null
               : () {
-                  submitCallback(_editingController.text, isPrivatePlayList);
+                  submitCallback(_editingTitleController.text, _editingIntroController.text);
                 },
           child: Text('提交'),
           textColor: Colors.red,

@@ -4,7 +4,7 @@ import 'package:extended_image/extended_image.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:netease_cloud_music/model/comment_head.dart';
-import 'package:netease_cloud_music/model/recommend.dart';
+import 'package:netease_cloud_music/model/songlists.dart';
 import 'package:netease_cloud_music/pages/look_img_page.dart';
 import 'package:netease_cloud_music/route/routes.dart';
 import 'package:netease_cloud_music/route/transparent_route.dart';
@@ -17,17 +17,22 @@ class NavigatorUtil {
       {bool replace = false,
       bool clearStack = false,
       Duration transitionDuration = const Duration(milliseconds: 250),
-      RouteTransitionsBuilder transitionBuilder}) {
+      RouteTransitionsBuilder transitionBuilder,
+      Function(dynamic msg) callback}) {
     Application.router.navigateTo(context, path,
         replace: replace,
         clearStack: clearStack,
         transitionDuration: transitionDuration,
         transitionBuilder: transitionBuilder,
-        transition: TransitionType.material);
+        transition: TransitionType.material).then((v){
+          if(callback != null) {
+            callback(v);
+          }
+    });
   }
 
   /// 登录页
-  static void goLoginPage(BuildContext context) {
+  static goLoginPage(BuildContext context) {
     _navigateTo(context, Routes.login, clearStack: true);
   }
 
@@ -42,9 +47,8 @@ class NavigatorUtil {
   }
 
   /// 歌单详情
-  static void goPlayListPage(BuildContext context, {@required Recommend data}) {
-    _navigateTo(context,
-        "${Routes.playList}?data=${FluroConvertUtils.object2string(data)}");
+  static void goPlayListPage(BuildContext context, {@required SongList data, Function callback}) {
+    _navigateTo(context, "${Routes.playList}?data=${FluroConvertUtils.object2string(data)}", callback: callback);
   }
 
   /// 排行榜首页

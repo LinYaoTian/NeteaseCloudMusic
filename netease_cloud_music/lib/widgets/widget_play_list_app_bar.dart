@@ -1,7 +1,8 @@
 import 'dart:ui';
 
-import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:netease_cloud_music/utils/net_utils.dart';
 import 'package:netease_cloud_music/utils/utils.dart';
 import 'package:netease_cloud_music/widgets/widget_music_list_header.dart';
 
@@ -15,6 +16,8 @@ class PlayListAppBarWidget extends StatelessWidget {
   final double sigma;
   final PlayModelCallback playOnTap;
   final int count;
+  final bool isCollected;
+  final Function() clickCollect;
 
   PlayListAppBarWidget({
     @required this.expandedHeight,
@@ -24,6 +27,8 @@ class PlayListAppBarWidget extends StatelessWidget {
     this.sigma = 5,
     this.playOnTap,
     this.count,
+    @required this.isCollected,
+    @required this.clickCollect
   });
 
   @override
@@ -42,6 +47,7 @@ class PlayListAppBarWidget extends StatelessWidget {
       bottom: MusicListHeader(
         onTap: playOnTap,
         count: count,
+        tail: CollectWidget(isCollected: isCollected, clickCollect: clickCollect,),
       ),
       flexibleSpace: FlexibleDetailBar(
         content: content,
@@ -76,4 +82,47 @@ class PlayListAppBarWidget extends StatelessWidget {
       ),
     );
   }
+}
+
+class CollectWidget extends StatefulWidget{
+
+  bool isCollected = false;
+
+  Function() clickCollect;
+
+  CollectWidget({this.isCollected, this.clickCollect});
+
+  @override
+  State<StatefulWidget> createState() {
+    return _CollectState();
+  }}
+
+class _CollectState extends State<CollectWidget>{
+
+  bool isCollected = false;
+
+  @override
+  void initState() {
+    super.initState();
+    isCollected = widget.isCollected;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      child: Padding(
+        padding: EdgeInsets.only(right: ScreenUtil().setWidth(30)),
+        child: Image.asset(
+            isCollected ? 'images/like.png' : 'images/dislike.png',
+            height: ScreenUtil().setWidth(60),
+            width: ScreenUtil().setWidth(60)),),
+      onTap: (){
+        widget.clickCollect();
+        setState((){
+          isCollected = !isCollected;
+        });
+      },
+    );
+  }
+
 }

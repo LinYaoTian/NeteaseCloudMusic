@@ -6,12 +6,12 @@ import 'package:netease_cloud_music/widgets/widget_round_img.dart';
 import 'common_text_style.dart';
 import 'h_empty_view.dart';
 
-class ArtistsWidget extends StatelessWidget {
+class SingersWidget extends StatelessWidget {
   final String picUrl;
   final String name;
   final int accountId;
 
-  const ArtistsWidget({Key key, this.picUrl, this.name, this.accountId})
+  const SingersWidget({Key key, this.picUrl, this.name, this.accountId})
       : super(key: key);
 
   @override

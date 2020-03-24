@@ -1,31 +1,59 @@
-class MyPlayListData{
+import 'package:netease_cloud_music/model/songlists.dart';
+
+class MyPlayListData {
   num _code;
-  List<Playlist> playlist;
+  List<SongList> selfSongLists;
+  List<SongList> collectSongLists;
+
+  MyPlayListData.fromNetJson(Map<String, dynamic> json) {
+    _code = json['code'];
+    var data = json['data'];
+    if (data != null) {
+      if (data['self_songlist'] != null) {
+        selfSongLists = new List<SongList>();
+        data['self_songlist'].forEach((v) {
+          selfSongLists.add(new SongList.fromJson(v));
+        });
+      }
+      if (data['collect_songlist'] != null) {
+        collectSongLists = new List<SongList>();
+        data['collect_songlist'].forEach((v) {
+          collectSongLists.add(new SongList.fromJson(v));
+        });
+      }
+    }
+  }
 
   MyPlayListData.fromJson(Map<String, dynamic> json) {
     _code = json['code'];
-
-    if (json['playlist'] != null) {
-      playlist = new List<Playlist>();
-      json['playlist'].forEach((v) {
-        playlist.add(new Playlist.fromJson(v));
-      });
-    }
-
-
-    Map<String, dynamic> toJson() {
-      final Map<String, dynamic> data = new Map<String, dynamic>();
-      data['code'] = this._code;
-      if (this.playlist != null) {
-        data['playlist'] = this.playlist.map((v) => v.toJson()).toList();
+    if (json != null) {
+      if (json['self_songlist'] != null) {
+        selfSongLists = new List<SongList>();
+        json['self_songlist'].forEach((v) {
+          selfSongLists.add(new SongList.fromJson(v));
+        });
       }
-      return data;
+      if (json['collect_songlist'] != null) {
+        collectSongLists = new List<SongList>();
+        json['collect_songlist'].forEach((v) {
+          collectSongLists.add(new SongList.fromJson(v));
+        });
+      }
     }
+  }
 
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['code'] = this._code;
+    if (this.selfSongLists != null) {
+      data['self_songlist'] = this.selfSongLists.map((v) => v.toJson()).toList();
+    }
+    if (this.collectSongLists != null) {
+      data['collect_songlist'] = this.collectSongLists.map((v) => v.toJson()).toList();
+    }
+    return data;
   }
 }
-
-
 
 class PlayListData {
   num _code;
@@ -880,3 +908,4 @@ class TrackIds {
     return data;
   }
 }
+

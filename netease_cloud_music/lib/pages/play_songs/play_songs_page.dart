@@ -103,7 +103,7 @@ class _PlaySongsPageState extends State<PlaySongsPage>
                     style: commonWhiteTextStyle,
                   ),
                   Text(
-                    model.curSong.artists,
+                    model.curSong.singerName,
                     style: smallWhite70TextStyle,
                   ),
                 ],
@@ -197,17 +197,21 @@ class _PlaySongsPageState extends State<PlaySongsPage>
       height: ScreenUtil().setWidth(100),
       child: Row(
         children: <Widget>[
-          ImageMenuWidget('images/icon_dislike.png', 80),
-          ImageMenuWidget(
-            'images/icon_song_download.png',
-            80,
-            onTap: () {},
-          ),
-          ImageMenuWidget(
-            'images/bfc.png',
-            80,
-            onTap: () {},
-          ),
+          GestureDetector(
+            child: ImageMenuWidget('images/icon_dislike.png', 80),
+            onTap: (){
+
+          },),
+//          ImageMenuWidget(
+//            'images/icon_song_download.png',
+//            80,
+//            onTap: () {},
+//          ),
+//          ImageMenuWidget(
+//            'images/bfc.png',
+//            80,
+//            onTap: () {},
+//          ),
           Expanded(
             child: Align(
               child: Container(
@@ -224,7 +228,7 @@ class _PlaySongsPageState extends State<PlaySongsPage>
                   builder: (context, data) {
                     return GestureDetector(
                       onTap: () {
-                        NavigatorUtil.goCommentPage(context, data: CommentHead(model.curSong.picUrl, model.curSong.name, model.curSong.artists, data.total, model.curSong.id, CommentType.song.index));
+                        NavigatorUtil.goCommentPage(context, data: CommentHead(model.curSong.picUrl, model.curSong.name, model.curSong.singerName, data.total, model.curSong.id, CommentType.song.index));
                       },
                       child: Stack(
                         alignment: Alignment.center,
@@ -253,7 +257,7 @@ class _PlaySongsPageState extends State<PlaySongsPage>
               ),
             ),
           ),
-          ImageMenuWidget('images/icon_song_more.png', 80),
+//          ImageMenuWidget('images/icon_song_more.png', 80),
         ],
       ),
     );

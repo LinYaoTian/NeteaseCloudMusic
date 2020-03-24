@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:netease_cloud_music/model/response_wrap.dart';
+import 'package:netease_cloud_music/model/search_result.dart';
 import 'package:netease_cloud_music/model/album.dart';
 import 'package:netease_cloud_music/model/banner.dart' as mBanner;
 import 'package:netease_cloud_music/model/daily_songs.dart';
@@ -13,8 +15,7 @@ import 'package:netease_cloud_music/model/lyric.dart';
 import 'package:netease_cloud_music/model/mv.dart';
 import 'package:netease_cloud_music/model/user.dart';
 import 'package:netease_cloud_music/model/play_list.dart';
-import 'package:netease_cloud_music/model/recommend.dart';
-import 'package:netease_cloud_music/model/search_result.dart' hide User;
+import 'package:netease_cloud_music/model/songlists.dart';
 import 'package:netease_cloud_music/model/song_comment.dart' hide User;
 import 'package:netease_cloud_music/model/song_detail.dart';
 import 'package:netease_cloud_music/model/top_list.dart';
@@ -29,13 +30,19 @@ import 'custom_log_interceptor.dart';
 
 class NetUtils {
   static Dio _dio;
-  static final String baseUrl = 'http://10.90.181.117:8000';
+  static Dio _testDio;
+  static final String baseUrl = 'http://118.24.63.15';
+  static final String testBaseUrl = 'http://192.168.0.104';
 
   static void init() async {
     Directory tempDir = await getTemporaryDirectory();
     String tempPath = tempDir.path;
     CookieJar cj = PersistCookieJar(dir: tempPath);
-    _dio = Dio(BaseOptions(baseUrl: baseUrl, followRedirects: true))
+    _dio = Dio(BaseOptions(baseUrl: '$baseUrl:1020', followRedirects: false))
+      ..interceptors.add(CookieManager(cj))
+      ..interceptors.add(CustomLogInterceptor(responseBody: true, requestBody: true));
+
+    _testDio = Dio(BaseOptions(baseUrl: '$testBaseUrl:8000', followRedirects: true))
       ..interceptors.add(CookieManager(cj))
       ..interceptors.add(CustomLogInterceptor(responseBody: true, requestBody: true));
   }
@@ -67,6 +74,33 @@ class NetUtils {
     }
   }
 
+  static Future<Response> _testGet(
+      BuildContext context,
+      String url, {
+        Map<String, dynamic> params,
+        bool isShowLoading = true,
+      }) async {
+    if (isShowLoading) Loading.showLoading(context);
+    try {
+      return await _testDio.get(url, queryParameters: params);
+    } on DioError catch (e) {
+      if (e == null) {
+        return Future.error(Response(data: -1));
+      } else if (e.response != null) {
+        if (e.response.statusCode >= 300 && e.response.statusCode < 400) {
+          _reLogin();
+          return Future.error(Response(data: "-2 response.statusCode = ${e.response.statusCode}"));
+        } else {
+          return Future.value(e.response);
+        }
+      } else {
+        return Future.error(Response(data: -3));
+      }
+    } finally {
+      Loading.hideLoading(context);
+    }
+  }
+
   static void _reLogin() {
     Future.delayed(Duration(milliseconds: 200), () {
       Application.getIt<NavigateService>().popAndPushNamed(Routes.login);
@@ -77,19 +111,19 @@ class NetUtils {
   /// 登录
   static Future<User> login(
       BuildContext context, String username, String password) async {
-    var response = await _get(context, '/users/login', params: {
+    var response = await _testGet(context, '/users/login', params: {
       'username': username,
       'password': password,
     });
-
-    return User.fromJson(jsonDecode(response.data));
+    return User.fromNetJson(jsonDecode(response.data));
   }
 
-  static Future<Response> refreshLogin(BuildContext context) async {
-    return await _get(context, '/login/refresh', isShowLoading: false)
+  static Future<User> refreshLogin(BuildContext context) async {
+    var response = await _testGet(context, '/users/refreshLogin', isShowLoading: false)
         .catchError((e) {
       Utils.showToast('网络错误！');
     });
+    return User.fromNetJson(jsonDecode(response.data));
   }
 
   /// 首页 Banner
@@ -99,9 +133,9 @@ class NetUtils {
   }
 
   /// 推荐歌单
-  static Future<RecommendData> getRecommendData(BuildContext context) async {
-    var response = await _get(context, '/recommend/resource');
-    return RecommendData.fromJson(response.data);
+  static Future<SongListData> getRandomData(BuildContext context) async {
+    var response = await _testGet(context, '/songlist/random');
+    return SongListData.fromJson(jsonDecode(response.data));
   }
 
   /// 新碟上架
@@ -138,12 +172,13 @@ class NetUtils {
   }
 
   /// 歌单详情
-  static Future<PlayListData> getPlayListData(
+  static Future<SongList> getSongListDetail(
     BuildContext context, {
     Map<String, dynamic> params,
   }) async {
-    var response = await _get(context, '/playlist/detail', params: params, isShowLoading: false);
-    return PlayListData.fromJson(response.data);
+    var response = await _testGet(context, '/songlist/info', params: params, isShowLoading: false);
+    var data = SongList.fromNetJson(jsonDecode(response.data));
+    return data;
   }
 
   /// 歌曲详情
@@ -153,21 +188,6 @@ class NetUtils {
   }) async {
     var response = await _get(context, '/song/detail', params: params);
     return SongDetailData.fromJson(response.data);
-  }
-
-  /// ** 验证发现原来的歌单详情接口就有数据，不用请求两次！！ **
-  /// 真正的歌单详情
-  /// 因为歌单详情只能获取歌单信息，并不能获取到歌曲信息，所以要请求两个接口，先获取歌单详情，再获取歌曲详情
-  static Future<SongDetailData> _getPlayListData(
-    BuildContext context, {
-    Map<String, dynamic> params,
-  }) async {
-    var r = await getPlayListData(context, params: params);
-    var response = await getSongsDetailData(context, params: {
-      'ids': r.playlist.trackIds.map((t) => t.id).toList().join(',')
-    });
-    response.playlist = r.playlist;
-    return response;
   }
 
   /// 排行榜首页
@@ -239,34 +259,55 @@ class NetUtils {
     return LyricData.fromJson(response.data);
   }
 
+
   /// 获取个人歌单
   static Future<MyPlayListData> getSelfPlaylistData(
     BuildContext context, {
     @required Map<String, dynamic> params,
   }) async {
-    var response = await _get(context, '/user/playlist',
+    var response = await _testGet(context, '/songlist/self',
         params: params, isShowLoading: false);
-    return MyPlayListData.fromJson(response.data);
+    return MyPlayListData.fromNetJson(jsonDecode(response.data));
   }
 
   /// 创建歌单
-  static Future<PlayListData> createPlaylist(
+  static Future<SongList> createPlaylist(
     BuildContext context, {
     @required Map<String, dynamic> params,
   }) async {
-    var response = await _get(context, '/playlist/create',
+    var response = await _testGet(context, '/songlist/create',
         params: params, isShowLoading: true);
-    return PlayListData.fromJson(response.data);
+    return SongList.fromJson(jsonDecode(response.data)['data']);
   }
 
-  /// 创建歌单
-  static Future<PlayListData> deletePlaylist(
+  /// 更新歌单
+  static Future<SongList> updatePlaylist(
+      BuildContext context, {
+        @required Map<String, dynamic> params,
+      }) async {
+    var response = await _testGet(context, '/songlist/update',
+        params: params, isShowLoading: true);
+    return SongList.fromJson(jsonDecode(response.data)['data']);
+  }
+
+  /// 删除歌单
+  static Future<Response> deletePlaylist(
     BuildContext context, {
     @required Map<String, dynamic> params,
   }) async {
-    var response = await _get(context, '/playlist/delete',
+    var response = await _testGet(context, '/songlist/delete',
         params: params, isShowLoading: true);
-    return PlayListData.fromJson(response.data);
+    return response;
+  }
+
+  /// 收藏歌单
+  static Future<ResponseWrap> collectPlaylist(
+      BuildContext context, {
+        @required Map<String, dynamic> params,
+      }) async {
+    var response = await _testGet(context, '/songlist/collect',
+        params: params, isShowLoading: true);
+    return ResponseWrap.fromJson(jsonDecode(response.data));
   }
 
   /// 获取热门搜索数据
@@ -281,9 +322,9 @@ class NetUtils {
       BuildContext context, {
         @required Map<String, dynamic> params,
       }) async {
-    var response = await _get(context, '/search',
+    var response = await _testGet(context, '/search/info',
         params: params, isShowLoading: false);
-    return SearchMultipleData.fromJson(response.data);
+    return SearchMultipleData.fromJson(jsonDecode(response.data));
   }
 
   /// 获取动态数据

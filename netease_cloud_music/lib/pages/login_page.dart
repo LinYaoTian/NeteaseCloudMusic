@@ -150,6 +150,8 @@ class __LoginWidgetState extends State<_LoginWidget> {
                       Provider.of<PlayListModel>(context).user = value;
                       NavigatorUtil.goHomePage(context);
                     }
+                  }).catchError((e){
+                    Utils.showToast('登录失败！');
                   });
                 },
                 content: 'Login',

@@ -66,7 +66,7 @@ class EventSongWidget extends StatelessWidget {
                       ),
                       VEmptyView(5),
                       Text(
-                        song.artists,
+                        song.singerName,
                         style: common13GrayTextStyle,
                       ),
                     ],

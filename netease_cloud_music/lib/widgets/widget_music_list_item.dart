@@ -9,7 +9,7 @@ import 'common_text_style.dart';
 import 'h_empty_view.dart';
 
 class WidgetMusicListItem extends StatelessWidget {
-  final MusicData _data;
+  final SongItem _data;
   final VoidCallback onTap;
 
   WidgetMusicListItem(this._data, {this.onTap});
@@ -74,7 +74,7 @@ class WidgetMusicListItem extends StatelessWidget {
             ),
             Align(
               alignment: Alignment.center,
-              child: _data.mvid == 0
+              child: _data.id == 0
                   ? Container()
                   : IconButton(
                       icon: Icon(Icons.play_circle_outline),

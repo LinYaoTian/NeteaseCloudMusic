@@ -1,12 +1,12 @@
-class MusicData {
-  num mvid;
+class SongItem {
+  num id;
   String picUrl;
   String songName;
   String artists;
   int index;
 
-  MusicData({
-    this.mvid,
+  SongItem({
+    this.id,
     this.picUrl,
     this.songName,
     this.artists,

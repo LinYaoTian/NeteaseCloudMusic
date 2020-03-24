@@ -24,11 +24,8 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
   bool _isSearching = false; // 是否正在搜索，改变布局
   Map<String, int> _searchingTabMap = {
     '单曲': 1,
-    '专辑': 10,
-    '歌手': 100,
-    '歌单': 1000,
-    '用户': 1002,
-    '视频': 1014,
+    '歌单': 2,
+    '歌手': 3,
   };
   List<String> _searchingTabKeys = ['综合'];
   TabController _searchingTabController;
@@ -254,7 +251,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
           indicatorColor: Colors.red,
           labelColor: Colors.red,
           unselectedLabelColor: Colors.black87,
-          isScrollable: true,
+          isScrollable: false,
           indicatorSize: TabBarIndicatorSize.label,
           tabs: _searchingTabKeys
               .map((key) => Tab(
@@ -266,15 +263,19 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
         Expanded(
           child: TabBarView(
             children: [
-              SearchMultipleResultPage(searchText, onTapMore: (value) {
-                _searchingTabController.animateTo(value);
-              }, onTapSimText: (text){
-                searchText = text;
-                _search();
-              },),
+              SearchMultipleResultPage(
+                searchText,
+                onTapMore: (value) {
+                  _searchingTabController.animateTo(value);
+                },
+                onTapSimText: (text) {
+                  searchText = text;
+                  _search();
+                },
+              ),
               ..._searchingTabMap.keys
                   .map((key) => SearchOtherResultPage(
-                      _searchingTabMap[key].toString(), searchText))
+                  _searchingTabMap[key].toString(), searchText))
                   .toList()
             ],
             controller: _searchingTabController,
@@ -330,7 +331,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
           child: Stack(
             children: <Widget>[
               Padding(
-                padding: EdgeInsets.only(bottom: ScreenUtil().setWidth(80)),
+                padding: EdgeInsets.only(bottom: ScreenUtil().setWidth(110)),
                 child: _isSearching
                     ? _buildSearchingPage()
                     : _buildUnSearchingPage(),

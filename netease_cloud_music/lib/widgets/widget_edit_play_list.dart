@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:netease_cloud_music/model/play_list.dart';
+import 'package:netease_cloud_music/model/songlists.dart';
 import 'package:netease_cloud_music/widgets/h_empty_view.dart';
 
 import 'common_text_style.dart';
@@ -11,7 +12,7 @@ class EditPlayListWidget extends StatefulWidget {
 
 
   final SubmitCallback submitCallback;
-  final Playlist playlist;
+  final SongList playlist;
 
   EditPlayListWidget({@required this.submitCallback, @required this.playlist});
 
@@ -24,24 +25,25 @@ class _EditPlayListWidgetState extends State<EditPlayListWidget> {
   bool isPrivatePlayList = false;
   TextEditingController _editingController;
   TextEditingController _descTextController;
-  SubmitCallback submitCallback;
+  SubmitCallback _submitCallback;
 
   @override
   void initState() {
     super.initState();
+    _submitCallback = widget.submitCallback;
     _editingController = TextEditingController(text: widget.playlist.name);
-    _descTextController = TextEditingController(text: widget.playlist.description ?? "");
+    _descTextController = TextEditingController(text: widget.playlist.intro ?? "");
     _editingController.addListener((){
       if(_editingController.text.isEmpty){
         setState(() {
-          submitCallback = null;
+          _submitCallback = null;
         });
       }else{
-        setState(() {
-          if(submitCallback == null){
-            submitCallback = widget.submitCallback;
-          }
-        });
+        if(_submitCallback == null){
+          setState(() {
+            _submitCallback = widget.submitCallback;
+          });
+        }
       }
     });
   }
@@ -90,7 +92,9 @@ class _EditPlayListWidgetState extends State<EditPlayListWidget> {
         ),
         FlatButton(
           onPressed: () {
-            submitCallback(_editingController.text, _descTextController.text);
+            if(_submitCallback != null){
+              _submitCallback(_editingController.text, _descTextController.text);
+            }
           },
           child: Text('提交'),
           textColor: Colors.red,

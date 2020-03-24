@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:netease_cloud_music/model/recommend.dart';
+import 'package:netease_cloud_music/model/songlists.dart';
 import 'package:netease_cloud_music/model/top_list.dart';
 import 'package:netease_cloud_music/utils/navigator_util.dart';
 import 'package:netease_cloud_music/utils/net_utils.dart';
@@ -205,6 +205,6 @@ class _TopListPageState extends State<TopListPage> {
   }
 
   void toPlayListPage(TopList data){
-    NavigatorUtil.goPlayListPage(context, data: Recommend(picUrl: data.coverImgUrl, name: data.name, playcount: data.playCount, id: data.id));
+    NavigatorUtil.goPlayListPage(context, data: SongList(picUrl: data.coverImgUrl, name: data.name, number: data.playCount, id: data.id, isCollected: false));
   }
 }

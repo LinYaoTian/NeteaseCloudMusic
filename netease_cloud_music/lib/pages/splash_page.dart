@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:netease_cloud_music/application.dart';
+import 'package:netease_cloud_music/constans/config.dart';
 import 'package:netease_cloud_music/model/song.dart';
 import 'package:netease_cloud_music/provider/play_list_model.dart';
 import 'package:netease_cloud_music/provider/play_songs_model.dart';
@@ -56,11 +57,16 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     }
     if (userModel.user != null) {
       await NetUtils.refreshLogin(context).then((value){
-        if(value.data != -1){
+        if(value.code == CODE_OK){
           NavigatorUtil.goHomePage(context);
+          userModel.saveUserInfo(value);
+          Provider.of<PlayListModel>(context).user = userModel.user;
+        } else {
+          NavigatorUtil.goLoginPage(context);
         }
+      }).catchError((e){
+          NavigatorUtil.goLoginPage(context);
       });
-      Provider.of<PlayListModel>(context).user = userModel.user;
     } else
       NavigatorUtil.goLoginPage(context);
   }

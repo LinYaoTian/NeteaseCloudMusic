@@ -1,7 +1,7 @@
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:netease_cloud_music/model/comment_head.dart';
-import 'package:netease_cloud_music/model/recommend.dart';
+import 'package:netease_cloud_music/model/songlists.dart';
 import 'package:netease_cloud_music/pages/comment/comment_page.dart';
 import 'package:netease_cloud_music/pages/daily_songs/daily_songs_page.dart';
 import 'package:netease_cloud_music/pages/home/home_page.dart';
@@ -42,7 +42,7 @@ var dailySongsHandler = new Handler(
 var playListHandler = new Handler(
     handlerFunc: (BuildContext context, Map<String, List<Object>> params) {
       String data = params['data'].first;
-      return PlayListPage(Recommend.fromJson(FluroConvertUtils.string2map(data)));
+      return PlayListPage(SongList.fromJson(FluroConvertUtils.string2map(data)));
     });
 
 // 跳转到每日推荐歌曲

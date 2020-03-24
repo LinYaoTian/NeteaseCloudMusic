@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:netease_cloud_music/model/recommend.dart';
+import 'package:netease_cloud_music/model/songlists.dart';
 import 'package:netease_cloud_music/utils/navigator_util.dart';
 import 'package:netease_cloud_music/utils/number_utils.dart';
 import 'package:netease_cloud_music/widgets/rounded_net_image.dart';
@@ -25,11 +25,12 @@ class SearchPlayListWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: (){
-        NavigatorUtil.goPlayListPage(context, data: Recommend(
+        NavigatorUtil.goPlayListPage(context, data: SongList(
           id: id,
           name: name,
           picUrl: url,
-          playcount: playCount,
+          number: playCount,
+          isCollected: false
         ));
       },
       child: Padding(

@@ -7,7 +7,7 @@ import 'package:netease_cloud_music/widgets/common_text_style.dart';
 import 'package:netease_cloud_music/model/album.dart';
 import 'package:netease_cloud_music/model/banner.dart' as prefix0;
 import 'package:netease_cloud_music/model/mv.dart';
-import 'package:netease_cloud_music/model/recommend.dart';
+import 'package:netease_cloud_music/model/songlists.dart';
 import 'package:netease_cloud_music/utils/navigator_util.dart';
 import 'package:netease_cloud_music/utils/net_utils.dart';
 import 'package:netease_cloud_music/widgets/h_empty_view.dart';
@@ -25,17 +25,6 @@ class DiscoverPage extends StatefulWidget {
 
 class _HomePrePageState extends State<DiscoverPage>
     with TickerProviderStateMixin,  AutomaticKeepAliveClientMixin {
-
-
-  /// 构建轮播图
-  Widget _buildBanner() {
-    return CustomFutureBuilder<prefix0.Banner>(
-      futureFunc: NetUtils.getBannerData,
-      builder: (context, data) {
-        return CustomBanner(data.banners.map((e) => '${e.pic}?param=540y210').toList());
-      },
-    );
-  }
 
   /// 构建分类列表
   Widget _buildHomeCategoryList() {
@@ -126,11 +115,11 @@ class _HomePrePageState extends State<DiscoverPage>
   }
 
   /// 构建推荐歌单
-  Widget _buildRecommendPlayList() {
-    return CustomFutureBuilder<RecommendData>(
-      futureFunc: NetUtils.getRecommendData,
-      builder: (context, snapshot) {
-        var data = snapshot.recommend;
+  Widget _buildRandomPlayList() {
+    return CustomFutureBuilder<SongListData>(
+      futureFunc: NetUtils.getRandomData,
+      builder: (context, randomData) {
+        var data = randomData.songLists;
         return GridView.builder(
             padding: EdgeInsets.symmetric(
                 horizontal: ScreenUtil().setWidth(15)),
@@ -138,7 +127,7 @@ class _HomePrePageState extends State<DiscoverPage>
               return PlayListWidget(
                 text: data[index].name,
                 picUrl: data[index].picUrl,
-                playCount: data[index].playcount,
+                playCount: data[index].number,
                 maxLines: 2,
                 onTap: (){
                   NavigatorUtil.goPlayListPage(context, data: data[index]);
@@ -160,81 +149,6 @@ class _HomePrePageState extends State<DiscoverPage>
     );
   }
 
-  /// 构建新碟上架
-  Widget _buildNewAlbum() {
-    return CustomFutureBuilder<AlbumData>(
-        futureFunc: NetUtils.getAlbumData,
-        builder: (context, snapshot) {
-          var data = snapshot.albums;
-          return Container(
-              height: ScreenUtil().setWidth(300),
-              child: ListView.separated(
-                separatorBuilder: (context, index) {
-                  return HEmptyView(ScreenUtil().setWidth(30));
-                },
-                padding: EdgeInsets.symmetric(
-                    horizontal: ScreenUtil().setWidth(15)),
-                itemBuilder: (context, index) {
-                  return PlayListWidget(
-                    text: data[index].name,
-                    picUrl: data[index].picUrl,
-                    subText: data[index].artist.name ?? "",
-                    maxLines: 1,
-                  );
-                },
-                shrinkWrap: true,
-                scrollDirection: Axis.horizontal,
-                itemCount: data.length,
-              ));
-        });
-  }
-
-  /// 构建MV 排行榜
-  Widget _buildTopMv() {
-    return CustomFutureBuilder<MVData>(
-        futureFunc: NetUtils.getTopMvData,
-        builder: (context, snapshot) {
-          var data = snapshot.data;
-          return ListView.separated(
-            separatorBuilder: (context, index) {
-              return VEmptyView(ScreenUtil().setWidth(100));
-            },
-            padding: EdgeInsets.symmetric(
-                horizontal: ScreenUtil().setWidth(15)),
-            itemBuilder: (context, index) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  ClipRRect(
-                    borderRadius:
-                    BorderRadius.all(Radius.circular(8)),
-                    child: Utils.showNetImage(
-                      '${data[index].cover}?param=350&197',
-                    ),
-                  ),
-                  VEmptyView(5),
-                  Text(
-                    data[index].name,
-                    style: commonTextStyle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  VEmptyView(2),
-                  Text(
-                    data[index].artistName,
-                    style: smallGrayTextStyle,
-                  ),
-                ],
-              );
-            },
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: data.length,
-          );
-        });
-  }
-
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -244,7 +158,6 @@ class _HomePrePageState extends State<DiscoverPage>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            _buildBanner(),
             Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: ScreenUtil().setWidth(15),
@@ -257,38 +170,15 @@ class _HomePrePageState extends State<DiscoverPage>
                   _buildHomeCategoryList(),
                   VEmptyView(20),
                   Text(
-                    '推荐歌单',
+                    '随机歌单',
                     style: commonTextStyle,
                   ),
                 ],
               ),
             ),
             VEmptyView(20),
-            _buildRecommendPlayList(),
-            VEmptyView(30),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: ScreenUtil().setWidth(15),
-              ),
-              child: Text(
-                '新碟上架',
-                style: commonTextStyle,
-              ),
-            ),
+            _buildRandomPlayList(),
             VEmptyView(20),
-            _buildNewAlbum(),
-            VEmptyView(30),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: ScreenUtil().setWidth(15),
-              ),
-              child: Text(
-                'MV 排行',
-                style: commonTextStyle,
-              ),
-            ),
-            VEmptyView(20),
-            _buildTopMv(),
           ],
         ),
       ),

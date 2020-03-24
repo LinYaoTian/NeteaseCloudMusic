@@ -22,19 +22,18 @@ class UserModel with ChangeNotifier {
 
   /// 登录
   Future<User> login(BuildContext context, String phone, String pwd) async {
-
     User user = await NetUtils.login(context, phone, pwd);
     if (user.code != CODE_OK) {
       Utils.showToast('登录失败，请检查账号密码');
       return null;
     }
     Utils.showToast('登录成功');
-    _saveUserInfo(user);
+    saveUserInfo(user);
     return user;
   }
 
   /// 保存用户信息到 sp
-  _saveUserInfo(User user) {
+  saveUserInfo(User user) {
     _user = user;
     Application.sp.setString('user', json.encode(user.toJson()));
   }

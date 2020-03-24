@@ -18,7 +18,6 @@ class PlayWidget extends StatelessWidget {
       alignment: Alignment.bottomCenter,
       child: Consumer<PlaySongsModel>(builder: (context, model, child) {
         Widget child;
-
         if (model.allSongs.isEmpty)
           child = Text('暂无正在播放的歌曲');
         else {
@@ -38,7 +37,7 @@ class PlayWidget extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       Text(curSong.name, style: commonTextStyle, maxLines: 1, overflow: TextOverflow.ellipsis,),
-                      Text(curSong.artists, style: common13TextStyle,),
+                      Text(curSong.singerName, style: common13TextStyle,),
                     ],
                   ),
                 ),
@@ -70,7 +69,6 @@ class PlayWidget extends StatelessWidget {
             ),
           );
         }
-
         return Container(
           width: Application.screenWidth,
           height: ScreenUtil().setWidth(110) + Application.bottomBarHeight,

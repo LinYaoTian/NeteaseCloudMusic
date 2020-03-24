@@ -35,7 +35,7 @@ class _DailySongsPageState extends State<DailySongsPage> {
       body: Stack(
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.only(bottom: ScreenUtil().setWidth(80) + Application.bottomBarHeight),
+            padding: EdgeInsets.only(bottom: ScreenUtil().setWidth(110) + Application.bottomBarHeight),
             child: CustomScrollView(
               slivers: <Widget>[
                 PlayListAppBarWidget(
@@ -91,8 +91,8 @@ class _DailySongsPageState extends State<DailySongsPage> {
                               this.data = data;
                               var d = data.recommend[index];
                               return WidgetMusicListItem(
-                                MusicData(
-                                    mvid: d.mvid,
+                                SongItem(
+                                    id: d.mvid,
                                     picUrl: d.album.picUrl,
                                     songName: d.name,
                                     artists:
@@ -125,7 +125,7 @@ class _DailySongsPageState extends State<DailySongsPage> {
                 r.id,
                 name: r.name,
                 picUrl: r.album.picUrl,
-                artists: '${r.artists.map((a) => a.name).toList().join('/')}',
+                singerName: '${r.artists.map((a) => a.name).toList().join('/')}',
               ))
           .toList(),
       index: index,

@@ -1,12 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:netease_cloud_music/model/play_list.dart';
-import 'package:netease_cloud_music/model/recommend.dart';
+import 'package:netease_cloud_music/model/songlists.dart';
 import 'package:netease_cloud_music/pages/home/my/playlist_title.dart';
 import 'package:netease_cloud_music/provider/play_list_model.dart';
-import 'package:netease_cloud_music/provider/user_model.dart';
 import 'package:netease_cloud_music/utils/navigator_util.dart';
 import 'package:netease_cloud_music/utils/net_utils.dart';
 import 'package:netease_cloud_music/utils/utils.dart';
@@ -22,15 +20,6 @@ class MyPage extends StatefulWidget {
 }
 
 class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin {
-  Map<String, String> topMenuData = {
-    '本地音乐': 'images/icon_music.png',
-    '最近播放': 'images/icon_late_play.png',
-    '下载管理': 'images/icon_download_black.png',
-    '我的电台': 'images/icon_broadcast.png',
-    '我的收藏': 'images/icon_collect.png',
-  };
-
-  List<String> topMenuKeys;
   bool selfPlayListOffstage = false;
   bool collectPlayListOffstage = false;
   PlayListModel _playListModel;
@@ -38,61 +27,16 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin {
   @override
   void initState() {
     super.initState();
-    topMenuKeys = topMenuData.keys.toList();
-    WidgetsBinding.instance.addPostFrameCallback((d){
-      if(mounted) {
+    WidgetsBinding.instance.addPostFrameCallback((d) {
+      if (mounted) {
         _playListModel = Provider.of<PlayListModel>(context);
         _playListModel.getSelfPlaylistData(context);
       }
     });
   }
 
-  Widget _buildTopMenu() {
-    return ListView.separated(
-      shrinkWrap: true,
-      padding: EdgeInsets.zero,
-      physics: NeverScrollableScrollPhysics(),
-      itemBuilder: (context, index) {
-        var curKey = topMenuKeys[index];
-        var curValue = topMenuData[topMenuKeys[index]];
-        return Container(
-          height: ScreenUtil().setWidth(110),
-          alignment: Alignment.center,
-          child: Row(
-            children: <Widget>[
-              Container(
-                width: ScreenUtil().setWidth(140),
-                child: Align(
-                  child: Image.asset(
-                    curValue,
-                    width: ScreenUtil().setWidth(100),
-                    fit: BoxFit.fitWidth,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Text(
-                  curKey,
-                  style: commonTextStyle,
-                ),
-              )
-            ],
-          ),
-        );
-      },
-      separatorBuilder: (context, index) {
-        return Container(
-          color: Colors.grey,
-          margin: EdgeInsets.only(left: ScreenUtil().setWidth(140)),
-          height: ScreenUtil().setWidth(0.3),
-        );
-      },
-      itemCount: 5,
-    );
-  }
-
   /// 构建「我创建的歌单」「收藏的歌单」
-  Widget _buildPlayListItem(List<Playlist> data) {
+  Widget _buildPlayListItem(List<SongList> data) {
     return ListView.builder(
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
@@ -101,11 +45,7 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin {
           return ListTile(
             onTap: () {
               NavigatorUtil.goPlayListPage(context,
-                  data: Recommend(
-                      picUrl: '${curPlayList.coverImgUrl}?param=150y150',
-                      name: curPlayList.name,
-                      playcount: curPlayList.playCount,
-                      id: curPlayList.id));
+                  data: curPlayList);
             },
             contentPadding: EdgeInsets.zero,
             title: Padding(
@@ -113,11 +53,11 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin {
               child: Text(curPlayList.name),
             ),
             subtitle: Text(
-              '${curPlayList.trackCount}首',
+              '${curPlayList.number}首',
               style: smallGrayTextStyle,
             ),
             leading: RoundedNetImage(
-              '${curPlayList.coverImgUrl}?param=150y150',
+              '${curPlayList.picUrl}?param=150y150',
               width: 110,
               height: 110,
               radius: ScreenUtil().setWidth(12),
@@ -131,21 +71,25 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin {
                   color: Colors.grey,
                 ),
                 onPressed: () {
-                  showModalBottomSheet<Playlist>(
-                          context: context,
-                          builder: (context) {
-                            return PlayListMenuWidget(curPlayList, _playListModel);
-                          },
-                          backgroundColor: Colors.transparent)
-                      .then((v) {
-                    if (v != null) {
-                      // 1 为删除
-                      if(v.type == 1) {
-                        Utils.showToast('删除成功');
-                        _playListModel.delPlayList(curPlayList);
-                      }
-                    }
-                  });
+                  showModalBottomSheet<SongList>(
+                      context: context,
+                      builder: (context) {
+                        return PlayListMenuWidget(curPlayList, _playListModel,
+                            () {
+                          NetUtils.deletePlaylist(context,
+                                  params: {'songlist_id': curPlayList.id})
+                              .then((v) {
+                            if (v != null && v.statusCode == 200) {
+                              setState(() {
+                                _playListModel.delSelfCreatePlayList(curPlayList);
+                              });
+                              Navigator.pop(context);
+                            } else
+                              Utils.showToast('删除失败，请重试');
+                          });
+                        });
+                      },
+                      backgroundColor: Colors.transparent);
                 },
                 padding: EdgeInsets.zero,
               ),
@@ -156,7 +100,6 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin {
   }
 
   Widget _realBuildPlayList() {
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -179,8 +122,8 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin {
                       context: context,
                       builder: (context) {
                         return CreatePlayListWidget(
-                          submitCallback: (name, isPrivate) {
-                            _createPlaylist(name, isPrivate);
+                          submitCallback: (name, intro) {
+                            _createPlaylist(name, intro);
                           },
                         );
                       });
@@ -219,15 +162,19 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin {
   }
 
   /// 创建歌单
-  void _createPlaylist(String name, bool isPrivate) async {
-    NetUtils.createPlaylist(context,
-            params: {'name': name, 'privacy': isPrivate ? '10' : null})
-        .catchError((e) {
+  void _createPlaylist(String name, String intro) async {
+    NetUtils.createPlaylist(context, params: {
+      'name': name,
+      'intro': intro,
+      'user_id': _playListModel.user.userId
+    }).catchError((e) {
       Utils.showToast('创建失败');
     }).then((result) {
       Utils.showToast('创建成功');
       Navigator.of(context).pop();
-      _playListModel.addPlayList(result.playlist..creator = _playListModel.selfCreatePlayList[0].creator);
+      setState(() {
+        _playListModel.addSelfCreatePlayList(result);
+      });
     });
   }
 
@@ -239,16 +186,17 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin {
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            _buildTopMenu(),
             Container(
               color: Color(0xfff5f5f5),
               height: ScreenUtil().setWidth(25),
             ),
-            _playListModel == null ? Container(
-              height: ScreenUtil().setWidth(400),
-              alignment: Alignment.center,
-              child: CupertinoActivityIndicator(),
-            ) : _buildPlayList(),
+            _playListModel == null
+                ? Container(
+                    height: ScreenUtil().setWidth(400),
+                    alignment: Alignment.center,
+                    child: CupertinoActivityIndicator(),
+                  )
+                : _buildPlayList(),
           ],
         ),
       ),

@@ -28,6 +28,14 @@ class User{
     _nickName = json['nickName'];
   }
 
+  User.fromNetJson(Map<String, dynamic> json) {
+    _code = json['code'];
+    var data = json['data'];
+    _userId = data['id'];
+    _userName = data['username'];
+    _nickName = data['nickName'];
+  }
+
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['code'] = _code;
