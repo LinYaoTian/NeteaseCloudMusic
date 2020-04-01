@@ -63,7 +63,7 @@ class PlayListModel with ChangeNotifier {
     notifyListeners();
   }
 
-  void getSelfPlaylistData(BuildContext context) async{
+  void requestSelfPlaylistData(BuildContext context) async{
     var result = await NetUtils.getSelfPlaylistData(context, params: {'user_id': user.userId});
     _selfCreatePlayList = result.selfSongLists;
     _collectPlayList = result.collectSongLists;

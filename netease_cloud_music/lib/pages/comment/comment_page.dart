@@ -1,10 +1,13 @@
 import 'package:common_utils/common_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:netease_cloud_music/constans/config.dart';
 import 'package:netease_cloud_music/model/comment_head.dart';
 import 'package:netease_cloud_music/model/song_comment.dart';
 import 'package:netease_cloud_music/pages/comment/comment_type.dart';
+import 'package:netease_cloud_music/provider/user_model.dart';
 import 'package:netease_cloud_music/utils/net_utils.dart';
 import 'package:netease_cloud_music/utils/number_utils.dart';
 import 'package:netease_cloud_music/utils/utils.dart';
@@ -15,6 +18,7 @@ import 'package:netease_cloud_music/widgets/v_empty_view.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:netease_cloud_music/widgets/widget_load_footer.dart';
 import 'package:netease_cloud_music/widgets/widget_round_img.dart';
+import 'package:provider/provider.dart';
 
 import 'comment_input_widget.dart';
 
@@ -29,41 +33,41 @@ class CommentPage extends StatefulWidget {
 
 class _CommentPageState extends State<CommentPage> {
   Map<String, int> params;
-  List<Comments> commentData = [];
+  List<Comment> commentData = [];
   EasyRefreshController _controller;
   FocusNode _blankNode = FocusNode();
+  SongCommentData curRequestData;
+  UserModel userModel;
+
 
   @override
   void initState() {
     super.initState();
     _controller = EasyRefreshController();
     WidgetsBinding.instance.addPostFrameCallback((d) {
-      params = {'id': widget.commentHead.id};
+      params = {
+        'song_id': widget.commentHead.songId,
+        'offset':0
+      };
       _request();
     });
   }
 
   void _request() async {
-    var r = await NetUtils.getCommentData(context, widget.commentHead.type, params: params);
+    curRequestData = await NetUtils.getSongCommentData(context, params: params);
     setState(() {
-      if (r.hotComments != null && r.hotComments.isNotEmpty) {
-        commentData.add(Comments(isTitle: true, title: "精彩评论"));
-        commentData.addAll(r.hotComments);
-      }
-      if (commentData.where((d) => d.title == "最新评论").isEmpty) {
-        commentData.add(Comments(isTitle: true, title: "最新评论"));
-      }
-      commentData.addAll(r.comments);
+      commentData.addAll(curRequestData.comments);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    userModel = Provider.of<UserModel>(context);
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
           elevation: 0,
-          title: Text('评论(${widget.commentHead.count})'),
+          title: Text('评论'),
         ),
         body: Stack(
           children: <Widget>[
@@ -80,7 +84,7 @@ class _CommentPageState extends State<CommentPage> {
                       : params['offset']++;
                   _request();
                   _controller.finishLoad(
-                      noMore: commentData.length >= widget.commentHead.count);
+                      noMore: curRequestData.comments.length < 15);
                 },
                 child: SingleChildScrollView(
                   child: Column(
@@ -95,18 +99,14 @@ class _CommentPageState extends State<CommentPage> {
                           padding: EdgeInsets.only(
                               left: ScreenUtil().setWidth(30),
                               right: ScreenUtil().setWidth(30),
-                              bottom: ScreenUtil().setWidth(50)),
+                              bottom: ScreenUtil().setWidth(50),
+                              top: ScreenUtil().setWidth(50)),
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
                           itemBuilder: (context, index) {
                             return buildCommentItem(commentData[index]);
                           },
                           separatorBuilder: (context, index) {
-                            if (commentData[index].isTitle)
-                              return Container(
-                                margin: EdgeInsets.only(
-                                    top: ScreenUtil().setWidth(30)),
-                              );
                             return Container(
                               margin: EdgeInsets.symmetric(
                                   vertical: ScreenUtil().setWidth(30)),
@@ -124,14 +124,14 @@ class _CommentPageState extends State<CommentPage> {
               child: CommentInputWidget((content){
                 // 提交评论
                 NetUtils.sendComment(context, params: {
-                  't': 1,
-                  'type': widget.commentHead.type,
-                  'id': widget.commentHead.id,
-                  'content': content
+                  'song_id': widget.commentHead.songId,
+                  'content': content,
+                  'time': DateTime.now().millisecondsSinceEpoch
                 }).then((r){
                   Utils.showToast('评论成功！');
                   setState(() {
-                    commentData.insert(commentData.map((c) => c.title).toList().indexOf('最新评论')+1, r.comment);
+                    print('sendComment = $r');
+                    commentData.insert(0, r);
                   });
                 });
               }),
@@ -141,19 +141,11 @@ class _CommentPageState extends State<CommentPage> {
         ));
   }
 
-  Widget buildCommentItem(Comments data) {
-    if (data.isTitle)
-      return Padding(
-        padding: EdgeInsets.only(top: ScreenUtil().setWidth(20)),
-        child: Text(
-          data.title,
-          style: bold17TextStyle,
-        ),
-      );
+  Widget buildCommentItem(Comment data) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        RoundImgWidget(data.user.avatarUrl, 70),
+        RoundImgWidget(data.picUrl, 70),
         HEmptyView(10),
         Expanded(
           child: Column(
@@ -163,23 +155,27 @@ class _CommentPageState extends State<CommentPage> {
               Row(
                 children: <Widget>[
                   Text(
-                    data.user.nickname,
+                    data.nickname,
                     style: TextStyle(fontSize: 14, color: Colors.black54),
                   ),
                   Spacer(),
-                  Padding(
-                    padding: EdgeInsets.only(top: ScreenUtil().setWidth(5)),
-                    child: Text(
-                      '${NumberUtils.amountConversion(data.likedCount)}',
-                      style: common14GrayTextStyle,
-                    ),
-                  ),
-                  HEmptyView(5),
-                  Image.asset(
-                    'images/icon_parise.png',
-                    width: ScreenUtil().setWidth(35),
-                    height: ScreenUtil().setWidth(35),
-                  )
+                  data.userId != userModel.user.userId ? Container():InkWell(
+                      child: Icon(
+                        Icons.delete,
+                        color: Colors.black45),
+                      onTap: (){
+                        NetUtils.deleteComment(context, params: {'comment_id':data.id})
+                            .then((v){
+                            if(v != null && v.code == CODE_OK) {
+                              setState(() {
+                                Utils.showToast('删除成功！');
+                                commentData.remove(data);
+                              });
+                            } else {
+                              Utils.showToast(v.msg);
+                            }
+                        });
+                      })
                 ],
               ),
               VEmptyView(5),

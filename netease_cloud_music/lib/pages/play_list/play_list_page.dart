@@ -94,6 +94,11 @@ class _PlayListPageState extends State<PlayListPage> {
                                       VEmptyView(10),
                                       Row(
                                         children: <Widget>[
+                                          _data == null
+                                              ? Container()
+                                              : RoundImgWidget(
+                                              _data.ownerPicUrl ?? DEFAULT_PIC_URL, 50),
+                                          HEmptyView(5),
                                           Expanded(
                                             child: _data == null
                                                 ? Container()

@@ -1,4 +1,5 @@
 
+import 'package:flutter/foundation.dart';
 import 'package:netease_cloud_music/model/song.dart';
 
 class SongListData {
@@ -53,13 +54,14 @@ class SongList {
   int _number;
   int _ownerId;
   String _ownerNickName;
+  String _ownerPicUrl;
   String _intro;
   String _picUrl;
   bool _isCollected = false;
   List<Song> _songs;
 
   SongList({int id, String name, int number, int ownerId, String intro,
-      String picUrl, String ownerNickName, List<Song> songs, bool isCollected}){
+      String picUrl, String ownerNickName, List<Song> songs, bool isCollected, String ownerPicUrl}){
     _id = id;
     _name = name;
     _number = number;
@@ -69,12 +71,12 @@ class SongList {
     _ownerNickName = ownerNickName;
     _songs = songs;
     _isCollected = isCollected;
+    _ownerPicUrl = ownerPicUrl;
   }
-
 
   @override
   String toString() {
-    return 'SongList{_id: $_id, _name: $_name, _number: $_number, _ownerId: $_ownerId, _ownerNickName: $_ownerNickName, _intro: $_intro, _picUrl: $_picUrl, _isCollected: $_isCollected, _songs: $_songs}';
+    return 'SongList{_id: $_id, _name: $_name, _number: $_number, _ownerId: $_ownerId, _ownerNickName: $_ownerNickName, _ownerPicUrl: $_ownerPicUrl, _intro: $_intro, _picUrl: $_picUrl, _isCollected: $_isCollected, _songs: $_songs}';
   }
 
   SongList.fromNetJson(Map<String, dynamic> json) {
@@ -87,6 +89,7 @@ class SongList {
       _intro = info['intro'];
       _picUrl = info['pic_url'];
       _ownerNickName = info['owner_nickname'];
+      _ownerPicUrl = info['owner_pic_url'];
       _id = info['id'];
       if(info['is_collected'] != null) {
         _isCollected =  info['is_collected'];
@@ -111,6 +114,7 @@ class SongList {
     _intro = json['intro'];
     _picUrl = json['pic_url'];
     _ownerNickName = json['owner_nickname'];
+    _ownerPicUrl = json['owner_pic_url'];
     if(json['is_collected'] != null) {
       _isCollected =  json['is_collected'];
     }
@@ -131,6 +135,7 @@ class SongList {
     data['owner_id'] = this._ownerId;
     data['intro'] = this._intro;
     data['owner_nickname'] = this._ownerNickName;
+    data['owner_pic_url'] = this._ownerPicUrl;
     data['is_collected'] = this._isCollected;
     if (this._songs != null) {
       data['songs'] = this.songs.map((v) => v.toJson()).toList();
@@ -138,6 +143,11 @@ class SongList {
     return data;
   }
 
+  String get ownerPicUrl => _ownerPicUrl;
+
+  set ownerPicUrl(String value) {
+    _ownerPicUrl = value;
+  }
 
   String get ownerNickName => _ownerNickName;
 

@@ -30,7 +30,7 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin {
     WidgetsBinding.instance.addPostFrameCallback((d) {
       if (mounted) {
         _playListModel = Provider.of<PlayListModel>(context);
-        _playListModel.getSelfPlaylistData(context);
+        _playListModel.requestSelfPlaylistData(context);
       }
     });
   }
@@ -44,8 +44,7 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin {
           var curPlayList = data[index];
           return ListTile(
             onTap: () {
-              NavigatorUtil.goPlayListPage(context,
-                  data: curPlayList);
+              NavigatorUtil.goPlayListPage(context, data: curPlayList);
             },
             contentPadding: EdgeInsets.zero,
             title: Padding(
@@ -81,7 +80,8 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin {
                               .then((v) {
                             if (v != null && v.statusCode == 200) {
                               setState(() {
-                                _playListModel.delSelfCreatePlayList(curPlayList);
+                                _playListModel
+                                    .delSelfCreatePlayList(curPlayList);
                               });
                               Navigator.pop(context);
                             } else
@@ -104,11 +104,15 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        PlaylistTitle("创建的歌单", _playListModel.selfCreatePlayList.length, () {
-          setState(() {
-            selfPlayListOffstage = !selfPlayListOffstage;
-          });
-        }, () {},
+        PlaylistTitle(
+            "创建的歌单",
+            _playListModel.selfCreatePlayList.length,
+                 () {
+                setState(() {
+                  selfPlayListOffstage = !selfPlayListOffstage;
+                });
+              },
+                () {},
             trailing: SizedBox(
               height: ScreenUtil().setWidth(50),
               width: ScreenUtil().setWidth(70),

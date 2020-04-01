@@ -1,11 +1,14 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:netease_cloud_music/constans/config.dart';
 import 'package:netease_cloud_music/provider/play_list_model.dart';
 import 'package:netease_cloud_music/provider/user_model.dart';
 import 'package:netease_cloud_music/utils/navigator_util.dart';
+import 'package:netease_cloud_music/utils/net_utils.dart';
 import 'package:netease_cloud_music/utils/utils.dart';
 import 'package:netease_cloud_music/widgets/common_button.dart';
+import 'package:netease_cloud_music/widgets/common_text_style.dart';
 import 'package:netease_cloud_music/widgets/v_empty_view.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -78,6 +81,7 @@ class _LoginWidget extends StatefulWidget {
 class __LoginWidgetState extends State<_LoginWidget> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _pwdController = TextEditingController();
+  bool isLookPassword = false;
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +117,7 @@ class __LoginWidgetState extends State<_LoginWidget> {
             controller: _phoneController,
             keyboardType: TextInputType.phone,
             decoration: InputDecoration(
-                hintText: 'Phone',
+                hintText: 'UserName',
                 prefixIcon: Icon(
                   Icons.phone_iphone,
                   color: Colors.grey,
@@ -121,14 +125,23 @@ class __LoginWidgetState extends State<_LoginWidget> {
           ),
           VEmptyView(40),
           TextField(
-            obscureText: true,
+            obscureText: isLookPassword,
             controller: _pwdController,
             decoration: InputDecoration(
                 hintText: 'Password',
                 prefixIcon: Icon(
                   Icons.lock,
                   color: Colors.grey,
-                )),
+                ),
+                suffixIcon: InkWell(
+                  child: Icon(
+                    Icons.remove_red_eye,
+                    color: isLookPassword ? Colors.grey : Colors.red,),
+                  onTap: (){
+                    setState(() {
+                      isLookPassword = !isLookPassword;
+                    });
+                  },)),
           ),
           VEmptyView(120),
           Consumer<UserModel>(
@@ -154,7 +167,36 @@ class __LoginWidgetState extends State<_LoginWidget> {
                     Utils.showToast('登录失败！');
                   });
                 },
-                content: 'Login',
+                content: '登录',
+                width: double.infinity,
+              );
+            },
+          ),
+          VEmptyView(40),
+          Consumer<UserModel>(
+            builder: (BuildContext context, UserModel value, Widget child) {
+              return CommonButton(
+                callback: () {
+                  String phone = _phoneController.text;
+                  String pwd = _pwdController.text;
+                  if (phone.isEmpty || pwd.isEmpty) {
+                    Utils.showToast('请输入账号或者密码');
+                    return;
+                  }
+                  value.register(
+                    context,
+                    phone,
+                    pwd,
+                  ).then((value){
+                    if(value != null){
+                      Provider.of<PlayListModel>(context).user = value;
+                      NavigatorUtil.goHomePage(context);
+                    }
+                  }).catchError((e){
+                    Utils.showToast('注册失败！');
+                  });
+                },
+                content: '注册',
                 width: double.infinity,
               );
             },

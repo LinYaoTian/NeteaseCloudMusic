@@ -5,11 +5,10 @@ class CommentHead{
   String img; // 图片
   String title; // 标题
   String author;  // 作者
-  int count;  // 评论数
-  int id; // id
+  int songId; // id
   int type; //类型（歌曲还是歌单之类的）
 
-  CommentHead(this.img, this.title, this.author, this.count, this.id, this.type);
+  CommentHead(this.img, this.title, this.author, this.songId, this.type);
 
 
 
@@ -17,8 +16,7 @@ class CommentHead{
     img = json['img'];
     title = json['title'];
     author = json['author'];
-    count = json['count'];
-    id = json['id'];
+    songId = json['id'];
     type = json['type'];
   }
 
@@ -27,8 +25,7 @@ class CommentHead{
     data['img'] = this.img;
     data['title'] = this.title;
     data['author'] = this.author;
-    data['count'] = this.count;
-    data['id'] = this.id;
+    data['id'] = this.songId;
     data['type'] = this.type;
     return data;
   }

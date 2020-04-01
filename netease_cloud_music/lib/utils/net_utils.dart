@@ -19,6 +19,7 @@ import 'package:netease_cloud_music/model/songlists.dart';
 import 'package:netease_cloud_music/model/song_comment.dart' hide User;
 import 'package:netease_cloud_music/model/song_detail.dart';
 import 'package:netease_cloud_music/model/top_list.dart';
+import 'package:netease_cloud_music/pages/play_songs/collect_songs.dart';
 import 'package:netease_cloud_music/route/navigate_service.dart';
 import 'package:netease_cloud_music/route/routes.dart';
 import 'package:netease_cloud_music/utils/utils.dart';
@@ -32,7 +33,7 @@ class NetUtils {
   static Dio _dio;
   static Dio _testDio;
   static final String baseUrl = 'http://118.24.63.15';
-  static final String testBaseUrl = 'http://192.168.0.104';
+  static final String testBaseUrl = 'http://10.90.181.117';
 
   static void init() async {
     Directory tempDir = await getTemporaryDirectory();
@@ -74,6 +75,33 @@ class NetUtils {
     }
   }
 
+  static Future<Response> _testPost(
+      BuildContext context,
+      String url, {
+        Map<String, dynamic> params,
+        dynamic data,
+        bool isShowLoading = true,
+      }) async {
+    if (isShowLoading) Loading.showLoading(context);
+    try {
+      return await _testDio.post(url, data:data, queryParameters: params,);
+    } on DioError catch (e) {
+      if (e == null) {
+        return Future.error(Response(data: -1));
+      } else if (e.response != null) {
+        if (e.response.statusCode >= 300 && e.response.statusCode < 400) {
+          return Future.error(Response(data: "-2 response.statusCode = ${e.response.statusCode}"));
+        } else {
+          return Future.value(e.response);
+        }
+      } else {
+        return Future.error(Response(data: -3));
+      }
+    } finally {
+      Loading.hideLoading(context);
+    }
+  }
+
   static Future<Response> _testGet(
       BuildContext context,
       String url, {
@@ -101,13 +129,6 @@ class NetUtils {
     }
   }
 
-  static void _reLogin() {
-    Future.delayed(Duration(milliseconds: 200), () {
-      Application.getIt<NavigateService>().popAndPushNamed(Routes.login);
-      Utils.showToast('登录失效，请重新登录');
-    });
-  }
-
   /// 登录
   static Future<User> login(
       BuildContext context, String username, String password) async {
@@ -116,6 +137,22 @@ class NetUtils {
       'password': password,
     });
     return User.fromNetJson(jsonDecode(response.data));
+  }
+
+  static Future<User> register(
+      BuildContext context, String username, String password) async {
+    var response = await _testPost(context, '/users/register', params: {
+      'username': username,
+      'password': password,
+    });
+    return User.fromNetJson(jsonDecode(response.data));
+  }
+
+  static void _reLogin() {
+    Future.delayed(Duration(milliseconds: 200), () {
+      Application.getIt<NavigateService>().popAndPushNamed(Routes.login);
+      Utils.showToast('登录失效，请重新登录');
+    });
   }
 
   static Future<User> refreshLogin(BuildContext context) async {
@@ -171,6 +208,24 @@ class NetUtils {
     return DailySongsData.fromJson(response.data);
   }
 
+
+  static Future<CheckBoxSongListData> getSongCollectStatus(
+      BuildContext context, {
+        Map<String, dynamic> params,
+      }) async {
+    var response = await _testGet(context, '/songlist/getSongCollect', params: params, isShowLoading: false);
+    return CheckBoxSongListData.fromJson(jsonDecode(response.data));
+  }
+
+  static Future<ResponseWrap> postSongCollectStatus(
+      BuildContext context, {
+        Map<String, dynamic> params,
+        dynamic data
+      }) async {
+    var response = await _testPost(context, '/songlist/postSongCollect', params: params, data: data, isShowLoading: false);
+    return ResponseWrap.fromJson(jsonDecode(response.data));
+  }
+
   /// 歌单详情
   static Future<SongList> getSongListDetail(
     BuildContext context, {
@@ -201,52 +256,28 @@ class NetUtils {
     BuildContext context, {
     @required Map<String, dynamic> params,
   }) async {
-    var response = await _get(context, '/comment/music',
+    var response = await _testGet(context, '/comment/get',
         params: params, isShowLoading: false);
-    return SongCommentData.fromJson(response.data);
+    return SongCommentData.fromNetJson(jsonDecode(response.data));
   }
 
   /// 获取评论列表
-  static Future<SongCommentData> getCommentData(
-    BuildContext context,
-    int type, {
-    @required Map<String, dynamic> params,
-  }) async {
-    var funcName;
-    switch (type) {
-      case 0: // song
-        funcName = 'music';
-        break;
-      case 1: // mv
-        funcName = 'mv';
-        break;
-      case 2: // 歌单
-        funcName = 'playlist';
-        break;
-      case 3: // 专辑
-        funcName = 'album';
-        break;
-      case 4: // 电台
-        funcName = 'dj';
-        break;
-      case 5: // 视频
-        funcName = 'video';
-        break;
-      // 动态评论需要threadId，后续再做
-    }
-    var response = await _get(context, '/comment/$funcName',
-        params: params, isShowLoading: false);
-    return SongCommentData.fromJson(response.data);
-  }
-
-  /// 获取评论列表
-  static Future<SongCommentData> sendComment(
+  static Future<Comment> sendComment(
     BuildContext context, {
     @required Map<String, dynamic> params,
   }) async {
     var response =
-        await _get(context, '/comment', params: params, isShowLoading: true);
-    return SongCommentData.fromJson(response.data);
+        await _testGet(context, '/comment/add', params: params, isShowLoading: true);
+    return Comment.fromNetJson(jsonDecode(response.data));
+  }
+
+  /// 获取评论列表
+  static Future<ResponseWrap> deleteComment(
+      BuildContext context, {
+        @required Map<String, dynamic> params,
+      }) async {
+    var response = await _testGet(context, '/comment/delete', params: params, isShowLoading: false);
+    return ResponseWrap.fromJson(jsonDecode(response.data));
   }
 
   /// 获取歌词
@@ -306,6 +337,15 @@ class NetUtils {
         @required Map<String, dynamic> params,
       }) async {
     var response = await _testGet(context, '/songlist/collect',
+        params: params, isShowLoading: true);
+    return ResponseWrap.fromJson(jsonDecode(response.data));
+  }
+
+  static Future<ResponseWrap> updateUserInfo(
+      BuildContext context, {
+        @required Map<String, dynamic> params,
+      }) async {
+    var response = await _testGet(context, '/users/update',
         params: params, isShowLoading: true);
     return ResponseWrap.fromJson(jsonDecode(response.data));
   }

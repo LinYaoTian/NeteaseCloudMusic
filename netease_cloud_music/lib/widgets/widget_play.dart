@@ -29,15 +29,15 @@ class PlayWidget extends StatelessWidget {
             },
             child: Row(
               children: <Widget>[
-                RoundImgWidget(curSong.picUrl, 80),
+                RoundImgWidget(curSong.picUrl ?? "", 80),
                 HEmptyView(10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Text(curSong.name, style: commonTextStyle, maxLines: 1, overflow: TextOverflow.ellipsis,),
-                      Text(curSong.singerName, style: common13TextStyle,),
+                      Text(curSong.name ?? "", style: commonTextStyle, maxLines: 1, overflow: TextOverflow.ellipsis,),
+                      Text(curSong.singerName ?? "", style: common13TextStyle,),
                     ],
                   ),
                 ),

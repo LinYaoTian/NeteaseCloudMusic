@@ -1,7 +1,7 @@
 import 'package:netease_cloud_music/model/song.dart';
 import 'package:netease_cloud_music/model/songlists.dart';
 
-import 'Singer.dart';
+import 'singer.dart';
 
 class SearchMultipleData {
   Result result;

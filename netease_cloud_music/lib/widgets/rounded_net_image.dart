@@ -1,6 +1,7 @@
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:netease_cloud_music/constans/config.dart';
 import 'package:netease_cloud_music/utils/utils.dart';
 
 class RoundedNetImage extends StatelessWidget {
@@ -17,7 +18,7 @@ class RoundedNetImage extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.all(Radius.circular(ScreenUtil().setWidth(radius))),
       child: Utils.showNetImage(
-        url,
+        url ?? DEFAULT_PIC_URL,
         width: width == null ? null : ScreenUtil().setWidth(width),
         height: height == null ? null : ScreenUtil().setWidth(height),
         fit: fit

@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:netease_cloud_music/model/Singer.dart';
+import 'package:netease_cloud_music/model/singer.dart';
 import 'package:netease_cloud_music/model/music.dart';
 import 'package:netease_cloud_music/model/song.dart' as prefix0;
 import 'package:netease_cloud_music/model/song.dart';

@@ -32,6 +32,17 @@ class UserModel with ChangeNotifier {
     return user;
   }
 
+  Future<User> register(BuildContext context, String phone, String pwd) async {
+    User user = await NetUtils.register(context, phone, pwd);
+    if (user.code != CODE_OK) {
+      Utils.showToast('注册失败，请检查账号密码');
+      return null;
+    }
+    Utils.showToast('注册成功');
+    saveUserInfo(user);
+    return user;
+  }
+
   /// 保存用户信息到 sp
   saveUserInfo(User user) {
     _user = user;
