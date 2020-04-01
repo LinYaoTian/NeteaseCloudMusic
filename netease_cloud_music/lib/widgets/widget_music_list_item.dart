@@ -28,7 +28,7 @@ class WidgetMusicListItem extends StatelessWidget {
           children: <Widget>[
             _data.index == null && _data.picUrl == null
                 ? Container()
-                : HEmptyView(15),
+                : HEmptyView(0),
             _data.picUrl == null
                 ? Container()
                 : RoundedNetImage(
@@ -70,24 +70,6 @@ class WidgetMusicListItem extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
-              ),
-            ),
-            Align(
-              alignment: Alignment.center,
-              child: _data.id == 0
-                  ? Container()
-                  : IconButton(
-                      icon: Icon(Icons.play_circle_outline),
-                      onPressed: () {},
-                      color: Colors.grey,
-                    ),
-            ),
-            Align(
-              alignment: Alignment.center,
-              child: IconButton(
-                icon: Icon(Icons.more_vert),
-                onPressed: () {},
-                color: Colors.grey,
               ),
             ),
           ],

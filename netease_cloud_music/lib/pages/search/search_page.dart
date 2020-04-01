@@ -218,6 +218,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
   void _search() {
     FocusScope.of(context).requestFocus(_blankNode);
     setState(() {
+      _searchingTabController.animateTo(0);
       if (historySearchList.contains(searchText))
         historySearchList.remove(searchText);
       historySearchList.insert(0, searchText);
@@ -262,27 +263,31 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
         ),
         Expanded(
           child: TabBarView(
-            children: [
-              SearchMultipleResultPage(
-                searchText,
-                onTapMore: (value) {
-                  _searchingTabController.animateTo(value);
-                },
-                onTapSimText: (text) {
-                  searchText = text;
-                  _search();
-                },
-              ),
-              ..._searchingTabMap.keys
-                  .map((key) => SearchOtherResultPage(
-                  _searchingTabMap[key].toString(), searchText))
-                  .toList()
-            ],
+            children: _createTabWidget(),
             controller: _searchingTabController,
           ),
         ),
       ],
     );
+  }
+
+  List<Widget> _createTabWidget(){
+    List<Widget> list = [];
+    list.add(SearchMultipleResultPage(
+      searchText,
+      onTapMore: (value) {
+        _searchingTabController.animateTo(value);
+      },
+      onTapSimText: (text) {
+        searchText = text;
+        _search();
+      },
+    ));
+    list.addAll(_searchingTabMap.keys
+        .map((key) => SearchOtherResultPage(
+        _searchingTabMap[key].toString(), searchText))
+        .toList());
+    return list;
   }
 
   @override
@@ -302,6 +307,8 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                     ? '林俊杰'
                     : _searchController.text;
                 _search();
+                setState(() {
+                });
               },
               textAlignVertical: TextAlignVertical.center,
               decoration: InputDecoration(
@@ -331,7 +338,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
           child: Stack(
             children: <Widget>[
               Padding(
-                padding: EdgeInsets.only(bottom: ScreenUtil().setWidth(110)),
+                padding: EdgeInsets.only(bottom: ScreenUtil().setWidth(90)),
                 child: _isSearching
                     ? _buildSearchingPage()
                     : _buildUnSearchingPage(),

@@ -68,6 +68,12 @@ class NavigatorUtil {
         "${Routes.comment}?data=${FluroConvertUtils.object2string(data)}");
   }
 
+  static void goSingerPage(BuildContext context,
+      {@required int singerId}) {
+    _navigateTo(context,
+        "${Routes.singer}?data=$singerId");
+  }
+
   /// 搜索页面
   static void goSearchPage(BuildContext context) {
     _navigateTo(context, Routes.search);

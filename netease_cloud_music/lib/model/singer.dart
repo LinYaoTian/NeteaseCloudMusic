@@ -1,3 +1,44 @@
+import 'package:netease_cloud_music/model/song.dart';
+
+class SingerData {
+  int code;
+  Singer singer;
+  List<Song> songs = [];
+
+  SingerData.name(this.code, this.singer, this.songs);
+
+  @override
+  String toString() {
+    return 'SingerData{code: $code, singer: $singer, songs: $songs}';
+  }
+
+  SingerData.fromNetJson(Map<String, dynamic> json) {
+    if (json == null) {
+      return;
+    }
+    code = json['id'];
+    var data = json['data'];
+    if (data != null) {
+      singer = Singer.fromJson(data['singer']);
+      songs = [];
+      data['songs'].forEach((v){
+        songs.add(Song.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['code'] = code;
+    data['singer'] = singer.toJson();
+    data['songs'] = songs.map((v){
+      return v.toJson();
+    }).toList();
+    return data;
+  }
+
+}
+
 class Singer{
   int _id;
   String _name;

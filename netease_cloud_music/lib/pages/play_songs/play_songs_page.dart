@@ -94,18 +94,30 @@ class _PlaySongsPageState extends State<PlaySongsPage>
               brightness: Brightness.dark,
               iconTheme: IconThemeData(color: Colors.white),
               backgroundColor: Colors.transparent,
-              title: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text(
-                    model.curSong.name,
-                    style: commonWhiteTextStyle,
-                  ),
-                  Text(
-                    model.curSong.singerName,
-                    style: smallWhite70TextStyle,
-                  ),
-                ],
+              title: InkWell(
+                onTap: (){
+                  if(model.curSong.singerName != null
+                      && model.curSong.singerName.isNotEmpty
+                      && model.curSong.singerName != '暂无'
+                      && model.curSong.singerId != null) {
+                    NavigatorUtil.goSingerPage(context, singerId: model.curSong.singerId);
+                  } else {
+                    Utils.showToast('暂无此歌手信息！');
+                  }
+                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      model.curSong.name,
+                      style: commonWhiteTextStyle,
+                    ),
+                    Text(
+                      model.curSong.singerName,
+                      style: smallWhite70TextStyle,
+                    ),
+                  ],
+                ),
               ),
             ),
             Container(

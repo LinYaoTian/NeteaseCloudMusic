@@ -13,7 +13,7 @@ import 'package:netease_cloud_music/utils/net_utils.dart';
 import 'package:netease_cloud_music/widgets/common_text_style.dart';
 import 'package:netease_cloud_music/widgets/h_empty_view.dart';
 import 'package:netease_cloud_music/widgets/v_empty_view.dart';
-import 'package:netease_cloud_music/widgets/widget_artists.dart';
+import 'package:netease_cloud_music/widgets/widget_singer.dart';
 import 'package:netease_cloud_music/widgets/widget_load_footer.dart';
 import 'package:netease_cloud_music/widgets/widget_music_list_item.dart';
 import 'package:netease_cloud_music/widgets/widget_search_play_list.dart';
@@ -41,10 +41,12 @@ class _SearchOtherResultPageState extends State<SearchOtherResultPage>
   List<SongList> _songListsData = []; // 歌单数据
   EasyRefreshController _controller;
   int offset = 0;
+  String _oldKeywords;
 
   @override
   void initState() {
     super.initState();
+    _oldKeywords = widget.keywords;
     _controller = EasyRefreshController();
     WidgetsBinding.instance.addPostFrameCallback((d) {
       _params = {'key': widget.keywords, 'type': widget.type};
@@ -122,6 +124,7 @@ class _SearchOtherResultPageState extends State<SearchOtherResultPage>
                       child: WidgetMusicListItem(SongItem(
                           songName: song.name,
                           id: song.id,
+                          picUrl: song.picUrl,
                           artists: song.singerName)),
                     ),
                   );
@@ -139,21 +142,6 @@ class _SearchOtherResultPageState extends State<SearchOtherResultPage>
         );
       },
     );
-  }
-
-  void _playSongs(PlaySongsModel model, List<Song> data, int index) {
-    model.playSongs(
-      data
-          .map((r) => prefix0.Song(
-                r.id,
-                name: r.name,
-                picUrl: r.picUrl,
-                singerName: r.singerName,
-              ))
-          .toList(),
-      index: index,
-    );
-    NavigatorUtil.goPlaySongsPage(context);
   }
 
   // 构建歌手页面
@@ -181,6 +169,7 @@ class _SearchOtherResultPageState extends State<SearchOtherResultPage>
     });
   }
 
+  // 底部加载更多
   Widget _buildLoadMoreWidget<T>(
       List<T> data, LoadMoreWidgetBuilder<T> builder) {
     return EasyRefresh.custom(
@@ -197,6 +186,21 @@ class _SearchOtherResultPageState extends State<SearchOtherResultPage>
         _controller.finishLoad(noMore: _count < 15);
       },
     );
+  }
+
+  void _playSongs(PlaySongsModel model, List<Song> data, int index) {
+    model.playSongs(
+      data
+          .map((r) => prefix0.Song(
+        r.id,
+        name: r.name,
+        picUrl: r.picUrl,
+        singerName: r.singerName,
+      ))
+          .toList(),
+      index: index,
+    );
+    NavigatorUtil.goPlaySongsPage(context);
   }
 
   @override
@@ -230,4 +234,37 @@ class _SearchOtherResultPageState extends State<SearchOtherResultPage>
 
   @override
   bool get wantKeepAlive => true;
+
+
+
+  @override
+  void didUpdateWidget(SearchOtherResultPage oldWidget) {
+    // 如果方法还一样，但是参数不一样了，则重新请求
+    if (oldWidget.keywords != null &&
+        widget.keywords != null) {
+      if (_oldKeywords != widget.keywords) {
+        print('keywords not');
+        _oldKeywords = widget.keywords;
+        offset = 0;
+        _params = {'key': widget.keywords, 'type': widget.type};
+        WidgetsBinding.instance.addPostFrameCallback((call) {
+          switch (int.parse(widget.type)) {
+            case 1: // 单曲
+              _songsData.clear();
+              break;
+            case 2: // 歌单
+              _songListsData.clear();
+              break;
+            case 3: // 歌手
+              _singersData.clear();
+              break;
+            default:
+              break;
+          }
+          _request();
+        });
+      }
+    }
+    super.didUpdateWidget(oldWidget);
+  }
 }

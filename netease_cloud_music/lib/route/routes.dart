@@ -14,6 +14,7 @@ class Routes {
   static String comment = "/comment";
   static String search = "/search";
   static String lookImg = "/look_img";
+  static String singer = "/singer";
 
   static void configureRoutes(Router router) {
     router.notFoundHandler = new Handler(
@@ -31,5 +32,6 @@ class Routes {
     router.define(comment, handler: commentHandler);
     router.define(search, handler: searchHandler);
     router.define(lookImg, handler: lookImgHandler);
+    router.define(singer, handler: singerHandler);
   }
 }

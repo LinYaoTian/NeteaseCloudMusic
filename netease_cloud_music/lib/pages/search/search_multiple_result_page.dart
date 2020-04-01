@@ -12,7 +12,7 @@ import 'package:netease_cloud_music/utils/net_utils.dart';
 import 'package:netease_cloud_music/widgets/common_text_style.dart';
 import 'package:netease_cloud_music/widgets/h_empty_view.dart';
 import 'package:netease_cloud_music/widgets/v_empty_view.dart';
-import 'package:netease_cloud_music/widgets/widget_artists.dart';
+import 'package:netease_cloud_music/widgets/widget_singer.dart';
 import 'package:netease_cloud_music/widgets/widget_future_builder.dart';
 import 'package:netease_cloud_music/widgets/widget_music_list_item.dart';
 import 'package:netease_cloud_music/widgets/widget_search_play_list.dart';
@@ -74,6 +74,7 @@ class _SearchMultipleResultPageState extends State<SearchMultipleResultPage>
             SongItem(
                 songName: songs[i].name,
                 id: songs[i].id,
+                picUrl: songs[i].picUrl,
                 artists: songs[i].singerName),
             onTap: () {
               _playSongs(model, songs, i);

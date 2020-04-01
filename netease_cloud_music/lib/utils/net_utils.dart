@@ -13,6 +13,7 @@ import 'package:netease_cloud_music/model/event.dart' as prefix0;
 import 'package:netease_cloud_music/model/hot_search.dart';
 import 'package:netease_cloud_music/model/lyric.dart';
 import 'package:netease_cloud_music/model/mv.dart';
+import 'package:netease_cloud_music/model/singer.dart';
 import 'package:netease_cloud_music/model/user.dart';
 import 'package:netease_cloud_music/model/play_list.dart';
 import 'package:netease_cloud_music/model/songlists.dart';
@@ -278,6 +279,15 @@ class NetUtils {
       }) async {
     var response = await _testGet(context, '/comment/delete', params: params, isShowLoading: false);
     return ResponseWrap.fromJson(jsonDecode(response.data));
+  }
+
+
+  static Future<SingerData> getSingerData(
+      BuildContext context, {
+        @required Map<String, dynamic> params,
+      }) async {
+    var response = await _testGet(context, '/singer/info', params: params, isShowLoading: true);
+    return SingerData.fromNetJson(jsonDecode(response.data));
   }
 
   /// 获取歌词
