@@ -2,6 +2,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:netease_cloud_music/provider/play_songs_model.dart';
+import 'package:netease_cloud_music/utils/utils.dart';
 import 'package:netease_cloud_music/widgets/widget_img_menu.dart';
 
 class PlayBottomMenuWidget extends StatelessWidget {
@@ -41,7 +42,9 @@ class PlayBottomMenuWidget extends StatelessWidget {
               model.nextPlay();
             },
           ),
-          ImageMenuWidget('images/icon_play_songs.png', 80),
+          ImageMenuWidget('images/icon_play_songs.png', 80, onTap: (){
+            Utils.showPlayingSongs(context);
+          },),
         ],
       ),
     );

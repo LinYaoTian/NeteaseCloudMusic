@@ -51,7 +51,7 @@ class _LyricPageState extends State<LyricPage> with TickerProviderStateMixin {
     _lyricData =
         await NetUtils.getLyricData(context, params: {'id': curSongId});
     setState(() {
-      lyrics = Utils.formatLyric(_lyricData.lrc.lyric);
+      lyrics = _lyricData.lrc != null ? Utils.formatLyric(_lyricData.lrc.lyric) : null;
       _lyricWidget = LyricWidget(lyrics, 0);
     });
   }

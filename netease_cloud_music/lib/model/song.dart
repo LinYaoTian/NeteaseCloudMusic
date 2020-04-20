@@ -4,25 +4,22 @@ class Song {
   String singerName; // 演唱者
   String picUrl; // 歌曲图片
   int singerId;
-  int commentNumber;
 
-  Song(this.id, {this.name, this.singerName, this.picUrl, this.singerId, this.commentNumber});
+  Song(this.id, {this.name, this.singerName, this.picUrl, this.singerId});
 
   Song.fromJson(Map<String, dynamic> json)
       : id = json['id'],
         name = json['name'],
         singerName = json['singer_name'] ?? "暂无",
         singerId = json['singer_id'],
-        picUrl = json['pic_url'],
-        commentNumber = json['comment_number'];
+        picUrl = json['pic_url'];
 
   Song.fromNetJson(Map<String, dynamic> json)
       : id = json['id'],
         name = json['name'],
         singerName = json['singer_name'] ?? '暂无',
         singerId = json['singer_id'],
-        picUrl = json['pic_url'],
-        commentNumber = json['comment_number'];
+        picUrl = json['pic_url'];
 
 
   Map<String, dynamic> toJson() => {
@@ -30,13 +27,12 @@ class Song {
         'name': name,
         'singer_name': singerName,
         'pic_url': picUrl,
-        'singer_id' : singerId,
-        'comment_number': commentNumber
+        'singer_id' : singerId
       };
 
   @override
   String toString() {
-    return 'Song{id: $id, name: $name, singerName: $singerName, picUrl: $picUrl, singerId: $singerId, commentNumber: $commentNumber}';
+    return 'Song{id: $id, name: $name, singerName: $singerName, picUrl: $picUrl, singerId: $singerId}';
   }
 
 

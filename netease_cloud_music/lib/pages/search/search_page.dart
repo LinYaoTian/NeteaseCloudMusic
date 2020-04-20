@@ -239,7 +239,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
           vertical: ScreenUtil().setWidth(30)),
       children: <Widget>[
         _buildHistorySearch(),
-        _buildHotSearch(),
+        //_buildHotSearch(),
       ],
     );
   }

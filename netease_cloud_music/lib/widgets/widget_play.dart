@@ -5,6 +5,7 @@ import 'package:netease_cloud_music/application.dart';
 import 'package:netease_cloud_music/model/song.dart';
 import 'package:netease_cloud_music/provider/play_songs_model.dart';
 import 'package:netease_cloud_music/utils/navigator_util.dart';
+import 'package:netease_cloud_music/utils/utils.dart';
 import 'package:netease_cloud_music/widgets/common_text_style.dart';
 import 'package:netease_cloud_music/widgets/h_empty_view.dart';
 import 'package:netease_cloud_music/widgets/widget_round_img.dart';
@@ -18,7 +19,7 @@ class PlayWidget extends StatelessWidget {
       alignment: Alignment.bottomCenter,
       child: Consumer<PlaySongsModel>(builder: (context, model, child) {
         Widget child;
-        if (model.allSongs.isEmpty)
+        if (model.allSongs.isEmpty || model.curIndex == model.allSongs.length)
           child = Text('暂无正在播放的歌曲');
         else {
           Song curSong = model.curSong;
@@ -59,7 +60,9 @@ class PlayWidget extends StatelessWidget {
                 ),
                 HEmptyView(15),
                 GestureDetector(
-                  onTap: (){},
+                  onTap: (){
+                    Utils.showPlayingSongs(context);
+                  },
                   child: Image.asset(
                     'images/list.png',
                     width: ScreenUtil().setWidth(50),

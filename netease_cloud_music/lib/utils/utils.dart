@@ -4,6 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:netease_cloud_music/model/lyric.dart';
+import 'package:netease_cloud_music/provider/play_songs_model.dart';
+import 'package:netease_cloud_music/widgets/widget_playing_songs_menu.dart';
+import 'package:provider/provider.dart';
 
 class Utils {
   static void showToast(String msg) {
@@ -18,6 +21,15 @@ class Utils {
       height: height,
       fit: fit,
     );
+  }
+
+  static void showPlayingSongs(BuildContext context) {
+    showModalBottomSheet<void>(
+        context: context,
+        builder: (context) {
+          return PlayingSongsMenuWidget(Provider.of<PlaySongsModel>(context));
+        },
+        backgroundColor: Colors.transparent);
   }
 
   /// 格式化歌词

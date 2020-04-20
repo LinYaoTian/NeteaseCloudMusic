@@ -166,9 +166,9 @@ class _HomePrePageState extends State<DiscoverPage>
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  VEmptyView(40),
-                  _buildHomeCategoryList(),
-                  VEmptyView(20),
+                  //VEmptyView(40),
+                  //_buildHomeCategoryList(),
+//                  VEmptyView(20),
                   Text(
                     '随机歌单',
                     style: commonTextStyle,

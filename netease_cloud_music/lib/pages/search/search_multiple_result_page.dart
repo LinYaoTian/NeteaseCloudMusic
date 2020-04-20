@@ -77,7 +77,7 @@ class _SearchMultipleResultPageState extends State<SearchMultipleResultPage>
                 picUrl: songs[i].picUrl,
                 artists: songs[i].singerName),
             onTap: () {
-              _playSongs(model, songs, i);
+              _playSong(model, songs[i]);
             },
           ));
         }
@@ -185,6 +185,11 @@ class _SearchMultipleResultPageState extends State<SearchMultipleResultPage>
         ),
       ),
     );
+  }
+
+  void _playSong(PlaySongsModel model, Song song) {
+    model.playSong(song);
+    NavigatorUtil.goPlaySongsPage(context);
   }
 
   void _playSongs(PlaySongsModel model, List<Song> data, int index) {

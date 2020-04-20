@@ -117,7 +117,7 @@ class _SearchOtherResultPageState extends State<SearchOtherResultPage>
                   return GestureDetector(
                     behavior: HitTestBehavior.translucent,
                     onTap: () {
-                      _playSongs(model, _songsData, index);
+                      _playSong(model, song);
                     },
                     child: Padding(
                       padding: EdgeInsets.only(left: ScreenUtil().setWidth(10)),
@@ -186,6 +186,11 @@ class _SearchOtherResultPageState extends State<SearchOtherResultPage>
         _controller.finishLoad(noMore: _count < 15);
       },
     );
+  }
+
+  void _playSong(PlaySongsModel model, Song song) {
+    model.playSong(song);
+    NavigatorUtil.goPlaySongsPage(context);
   }
 
   void _playSongs(PlaySongsModel model, List<Song> data, int index) {

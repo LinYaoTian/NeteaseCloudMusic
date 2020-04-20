@@ -43,11 +43,13 @@ class LyricWidget extends CustomPainter with ChangeNotifier {
     linePaint = Paint()
       ..color = Colors.white12
       ..strokeWidth = ScreenUtil().setWidth(1);
-    lyricPaints.addAll(lyric
-        .map((l) => TextPainter(
-            text: TextSpan(text: l.lyric, style: commonGrayTextStyle),
-            textDirection: TextDirection.ltr))
-        .toList());
+    if(lyric != null) {
+      lyricPaints.addAll(lyric
+          .map((l) => TextPainter(
+          text: TextSpan(text: l.lyric, style: commonGrayTextStyle),
+          textDirection: TextDirection.ltr))
+          .toList());
+    }
     // 首先对TextPainter 进行 layout，否则会报错
     _layoutTextPainters();
   }

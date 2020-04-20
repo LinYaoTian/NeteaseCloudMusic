@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           controller: _tabController,
                           tabs: [
                             Tab(
-                              text: '发现',
+                              text: '首页',
                             ),
                             Tab(
                               text: '我的',

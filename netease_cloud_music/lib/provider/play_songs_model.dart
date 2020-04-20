@@ -5,18 +5,27 @@ import 'package:flutter/material.dart';
 import 'package:netease_cloud_music/application.dart';
 import 'package:netease_cloud_music/model/song.dart';
 import 'package:netease_cloud_music/utils/fluro_convert_utils.dart';
+import 'package:netease_cloud_music/utils/utils.dart';
 
-class PlaySongsModel with ChangeNotifier{
+enum PlayerOrder {
+  ORDER,
+  RANDOM,
+  CYCLE
+}
+
+class PlaySongsModel with ChangeNotifier {
   AudioPlayer _audioPlayer = AudioPlayer();
   StreamController<String> _curPositionController = StreamController<String>.broadcast();
 
   List<Song> _songs = [];
+  List<Song> _shuffle = [];
+  int curIndexShuffle = 0;
   int curIndex = 0;
   Duration curSongDuration;
   AudioPlayerState _curState;
 
   List<Song> get allSongs => _songs;
-  Song get curSong => _songs[curIndex];
+  Song get curSong => _songs.isNotEmpty ? _songs[curIndex] : null;
   Stream<String> get curPositionStream => _curPositionController.stream;
   AudioPlayerState get curState => _curState;
 
@@ -47,26 +56,78 @@ class PlaySongsModel with ChangeNotifier{
     _curPositionController.sink.add('$m-${curSongDuration.inMilliseconds}');
   }
 
+  void shuffle() {
+    var oldSong = curSong;
+    _songs.shuffle();
+    curIndex = _songs.indexWhere((v){
+      return v.id == oldSong.id;
+    });
+  }
+
   // 播放一首歌
   void playSong(Song song) {
-    _songs.insert(curIndex, song);
+    if (song == null) {
+      return;
+    }
+    int index = _songs.indexWhere((s){
+      return s.id == song.id;
+    });
+    if(index > -1) {
+      curIndex = index;
+    } else {
+      _songs.insert(curIndex, song);
+    }
     play();
+  }
+
+  // 播放一首歌
+  void playSongByIndex(int index) {
+    if(index > -1 && index < _songs.length) {
+      curIndex = index;
+      play();
+    }
   }
 
   // 播放很多歌
   void playSongs(List<Song> songs, {int index}) {
+    if(songs == null) {
+      return;
+    }
     this._songs = songs;
-    if (index != null) curIndex = index;
+    curIndex = index ?? 0;
+    if(curIndex < 0 || curIndex > _songs.length - 1) {
+      curIndex = 0;
+    }
     play();
   }
 
   // 添加歌曲
   void addSongs(List<Song> songs) {
+    if(songs != null) {
+      return;
+    }
     this._songs.addAll(songs);
+    if(curState != AudioPlayerState.PLAYING) {
+      notifyListeners();
+    }
+  }
+
+  // 添加歌曲
+  void removeSongByIndex(int index) {
+    if (index > -1 && index < _songs.length) {
+      _songs.removeAt(index);
+      if(curState != AudioPlayerState.PLAYING) {
+        notifyListeners();
+      }
+    }
   }
 
   /// 播放
   void play() {
+    if(_songs.length == 0){
+      print('PlaySongsModel call play(): _songs is Empty !');
+      return;
+    }
     _audioPlayer.play(
         "https://music.163.com/song/media/outer/url?id=${this._songs[curIndex].id}.mp3");
     saveCurSong();
@@ -99,21 +160,23 @@ class PlaySongsModel with ChangeNotifier{
 
   /// 下一首
   void nextPlay(){
-    if(curIndex >= _songs.length){
-      curIndex = 0;
-    }else{
+    if(curIndex < _songs.length - 1) {
       curIndex++;
+      play();
+    } else {
+      Utils.showToast('歌曲列表已播放完毕！');
+      print('PlaySongsModel call nextPlay(): played all songs done !');
     }
-    play();
   }
 
   void prePlay(){
     if(curIndex <= 0){
-      curIndex = _songs.length - 1;
+      Utils.showToast('没有上一首歌曲！');
+      print('PlaySongsModel call prePlay(): played all songs done !');
     }else{
       curIndex--;
+      play();
     }
-    play();
   }
 
   // 保存当前歌曲到本地
