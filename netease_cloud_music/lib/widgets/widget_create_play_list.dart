@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:netease_cloud_music/utils/utils.dart';
 import 'package:netease_cloud_music/widgets/h_empty_view.dart';
 
 import 'common_text_style.dart';
@@ -39,19 +40,6 @@ class _CreatePlayListWidgetState extends State<CreatePlayListWidget> {
       }
     });
     _editingIntroController = TextEditingController();
-    _editingIntroController.addListener(() {
-      if (_editingIntroController.text.isEmpty) {
-        setState(() {
-          submitCallback = null;
-        });
-      } else {
-        setState(() {
-          if (submitCallback == null) {
-            submitCallback = widget.submitCallback;
-          }
-        });
-      }
-    });
   }
 
   @override
@@ -98,11 +86,13 @@ class _CreatePlayListWidgetState extends State<CreatePlayListWidget> {
           textColor: Colors.red,
         ),
         FlatButton(
-          onPressed: submitCallback == null
-              ? null
-              : () {
-                  submitCallback(_editingTitleController.text, _editingIntroController.text);
-                },
+          onPressed: () {
+            if(submitCallback != null) {
+              submitCallback(_editingTitleController.text, _editingIntroController.text);
+            } else {
+              Utils.showToast('歌单名不能为空！');
+            }
+          },
           child: Text('提交'),
           textColor: Colors.red,
         ),

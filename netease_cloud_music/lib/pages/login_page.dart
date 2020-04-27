@@ -150,8 +150,11 @@ class __LoginWidgetState extends State<_LoginWidget> {
                 callback: () {
                   String phone = _phoneController.text;
                   String pwd = _pwdController.text;
-                  if (phone.isEmpty || pwd.isEmpty) {
-                    Utils.showToast('请输入账号或者密码');
+                  if (phone.isEmpty) {
+                    Utils.showToast('账号不能为空');
+                    return;
+                  } else if(pwd.isEmpty){
+                    Utils.showToast('密码不能为空');
                     return;
                   }
                   value.login(
@@ -164,7 +167,7 @@ class __LoginWidgetState extends State<_LoginWidget> {
                       NavigatorUtil.goHomePage(context);
                     }
                   }).catchError((e){
-                    Utils.showToast('登录失败！');
+                    Utils.showToast('登录失败，请检查账号密码！');
                   });
                 },
                 content: '登录',
@@ -179,8 +182,11 @@ class __LoginWidgetState extends State<_LoginWidget> {
                 callback: () {
                   String phone = _phoneController.text;
                   String pwd = _pwdController.text;
-                  if (phone.isEmpty || pwd.isEmpty) {
-                    Utils.showToast('请输入账号或者密码');
+                  if (phone.isEmpty) {
+                    Utils.showToast('账号不能为空');
+                    return;
+                  } else if(pwd.isEmpty){
+                    Utils.showToast('密码不能为空');
                     return;
                   }
                   value.register(
@@ -193,7 +199,7 @@ class __LoginWidgetState extends State<_LoginWidget> {
                       NavigatorUtil.goHomePage(context);
                     }
                   }).catchError((e){
-                    Utils.showToast('注册失败！');
+                    Utils.showToast('注册失败，请检查账号密码！');
                   });
                 },
                 content: '注册',

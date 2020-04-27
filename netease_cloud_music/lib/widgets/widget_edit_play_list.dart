@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:netease_cloud_music/model/play_list.dart';
 import 'package:netease_cloud_music/model/songlists.dart';
+import 'package:netease_cloud_music/utils/utils.dart';
 import 'package:netease_cloud_music/widgets/h_empty_view.dart';
 
 import 'common_text_style.dart';
@@ -23,7 +24,7 @@ class EditPlayListWidget extends StatefulWidget {
 
 class _EditPlayListWidgetState extends State<EditPlayListWidget> {
   bool isPrivatePlayList = false;
-  TextEditingController _editingController;
+  TextEditingController _nameTextController;
   TextEditingController _descTextController;
   SubmitCallback _submitCallback;
 
@@ -31,10 +32,10 @@ class _EditPlayListWidgetState extends State<EditPlayListWidget> {
   void initState() {
     super.initState();
     _submitCallback = widget.submitCallback;
-    _editingController = TextEditingController(text: widget.playlist.name);
+    _nameTextController = TextEditingController(text: widget.playlist.name);
     _descTextController = TextEditingController(text: widget.playlist.intro ?? "");
-    _editingController.addListener((){
-      if(_editingController.text.isEmpty){
+    _nameTextController.addListener((){
+      if(_nameTextController.text.isEmpty){
         setState(() {
           _submitCallback = null;
         });
@@ -65,7 +66,7 @@ class _EditPlayListWidgetState extends State<EditPlayListWidget> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             TextField(
-              controller: _editingController,
+              controller: _nameTextController,
               decoration: InputDecoration(
                 hintText: "请输入歌单标题",
                 hintStyle: common14GrayTextStyle,
@@ -93,7 +94,9 @@ class _EditPlayListWidgetState extends State<EditPlayListWidget> {
         FlatButton(
           onPressed: () {
             if(_submitCallback != null){
-              _submitCallback(_editingController.text, _descTextController.text);
+              _submitCallback(_nameTextController.text, _descTextController.text);
+            } else {
+              Utils.showToast('歌单名不能为空！');
             }
           },
           child: Text('提交'),
