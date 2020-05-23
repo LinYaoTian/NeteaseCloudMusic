@@ -126,8 +126,8 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin {
                       context: context,
                       builder: (context) {
                         return CreatePlayListWidget(
-                          submitCallback: (name, intro) {
-                            _createPlaylist(name, intro);
+                          submitCallback: (name, intro, imageUrl) {
+                            _createPlaylist(name, intro, imageUrl);
                           },
                         );
                       });
@@ -166,11 +166,12 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin {
   }
 
   /// 创建歌单
-  void _createPlaylist(String name, String intro) async {
+  void _createPlaylist(String name, String intro, String imageUrl) async {
     NetUtils.createPlaylist(context, params: {
       'name': name,
       'intro': intro,
-      'user_id': _playListModel.user.userId
+      'user_id': _playListModel.user.userId,
+      'image_url': imageUrl,
     }).catchError((e) {
       Utils.showToast('创建失败');
     }).then((result) {

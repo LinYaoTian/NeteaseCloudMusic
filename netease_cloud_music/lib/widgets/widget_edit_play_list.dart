@@ -7,7 +7,7 @@ import 'package:netease_cloud_music/widgets/h_empty_view.dart';
 
 import 'common_text_style.dart';
 
-typedef SubmitCallback = Function(String name, String desc);
+typedef SubmitCallback = Function(String name, String desc, String picUrl);
 
 class EditPlayListWidget extends StatefulWidget {
 
@@ -26,6 +26,7 @@ class _EditPlayListWidgetState extends State<EditPlayListWidget> {
   bool isPrivatePlayList = false;
   TextEditingController _nameTextController;
   TextEditingController _descTextController;
+  TextEditingController _editingImageUrlController;
   SubmitCallback _submitCallback;
 
   @override
@@ -45,6 +46,15 @@ class _EditPlayListWidgetState extends State<EditPlayListWidget> {
             _submitCallback = widget.submitCallback;
           });
         }
+      }
+    });
+    _editingImageUrlController = TextEditingController();
+    _editingImageUrlController.text = widget.playlist.picUrl;
+    _editingImageUrlController.addListener((){
+      if(_editingImageUrlController.text.isEmpty){
+        setState(() {
+          _submitCallback = null;
+        });
       }
     });
   }
@@ -82,6 +92,14 @@ class _EditPlayListWidgetState extends State<EditPlayListWidget> {
               ),
               style: common14TextStyle,
             ),
+            TextField(
+              controller: _editingImageUrlController,
+              decoration: InputDecoration(
+                hintText: "输入歌单封面",
+                hintStyle: common14GrayTextStyle,
+              ),
+              style: common14TextStyle,
+            ),
           ],
         ),
       ),
@@ -94,7 +112,7 @@ class _EditPlayListWidgetState extends State<EditPlayListWidget> {
         FlatButton(
           onPressed: () {
             if(_submitCallback != null){
-              _submitCallback(_nameTextController.text, _descTextController.text);
+              _submitCallback(_nameTextController.text, _descTextController.text, _editingImageUrlController.text);
             } else {
               Utils.showToast('歌单名不能为空！');
             }

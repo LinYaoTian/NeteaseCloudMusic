@@ -34,7 +34,7 @@ class NetUtils {
   static Dio _dio;
   static Dio _testDio;
   static final String baseUrl = 'http://118.24.63.15';
-  static final String testBaseUrl = 'http://10.90.181.117';
+  static final String testBaseUrl = 'http://192.168.1.117';
 
   static void init() async {
     Directory tempDir = await getTemporaryDirectory();

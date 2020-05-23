@@ -82,8 +82,12 @@ class _PlayListMenuWidgetState extends State<PlayListMenuWidget> {
             offstage: widget._songList.ownerId != widget._model.user.userId,
             child: _buildMenuItem('images/icon_edit.png', '编辑歌单信息', () {
               showDialog(context: context, builder: (context){
-                return EditPlayListWidget(submitCallback: (String name, String desc) {
-                  NetUtils.updatePlaylist(context, params: {'name':name, 'intro':desc, 'songlist_id': widget._songList.id}).then((v){
+                return EditPlayListWidget(submitCallback: (String name, String desc, String picUrl) {
+                  NetUtils.updatePlaylist(context, params: {
+                    'name':name,
+                    'intro':desc,
+                    'songlist_id': widget._songList.id,
+                    'pic_url': picUrl}).then((v){
                     if(v != null) {
                       Provider.of<PlayListModel>(context).updateSelfCreatePlayList(v);
                       Navigator.pop(context);

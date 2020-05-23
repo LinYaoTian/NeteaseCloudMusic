@@ -5,7 +5,7 @@ import 'package:netease_cloud_music/widgets/h_empty_view.dart';
 
 import 'common_text_style.dart';
 
-typedef SubmitCallback = Function(String name, String intro);
+typedef SubmitCallback = Function(String name, String intro, String imageUrl);
 
 class CreatePlayListWidget extends StatefulWidget {
   final SubmitCallback submitCallback;
@@ -20,6 +20,7 @@ class _CreatePlayListWidgetState extends State<CreatePlayListWidget> {
   bool isPrivatePlayList = false;
   TextEditingController _editingTitleController;
   TextEditingController _editingIntroController;
+  TextEditingController _editingImageUrlController;
   SubmitCallback submitCallback;
 
   @override
@@ -40,6 +41,15 @@ class _CreatePlayListWidgetState extends State<CreatePlayListWidget> {
       }
     });
     _editingIntroController = TextEditingController();
+    _editingImageUrlController = TextEditingController();
+    _editingImageUrlController.text = "http://p1.music.126.net/GASFmKgo4lA3INFN5Az-6w==/109951164155929328.jpg";
+    _editingImageUrlController.addListener((){
+      if(_editingImageUrlController.text.isEmpty){
+        setState(() {
+          submitCallback = null;
+        });
+      }
+    });
   }
 
   @override
@@ -76,6 +86,14 @@ class _CreatePlayListWidgetState extends State<CreatePlayListWidget> {
               style: common14TextStyle,
               maxLength: 40,
             ),
+            TextField(
+              controller: _editingImageUrlController,
+              decoration: InputDecoration(
+                hintText: "请输入歌单封面",
+                hintStyle: common14GrayTextStyle,
+              ),
+              style: common14TextStyle,
+            ),
           ],
         ),
       ),
@@ -86,13 +104,13 @@ class _CreatePlayListWidgetState extends State<CreatePlayListWidget> {
           textColor: Colors.red,
         ),
         FlatButton(
-          onPressed: () {
+          onPressed: submitCallback != null ? () {
             if(submitCallback != null) {
-              submitCallback(_editingTitleController.text, _editingIntroController.text);
+              submitCallback(_editingTitleController.text, _editingIntroController.text, _editingImageUrlController.text);
             } else {
               Utils.showToast('歌单名不能为空！');
             }
-          },
+          } : null,
           child: Text('提交'),
           textColor: Colors.red,
         ),
